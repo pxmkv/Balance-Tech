@@ -14,4 +14,17 @@ M_Encoder GPIO 19, 23
 
 
 
-​	
+### Installing Libraries
+
+Open your Arduino IDE and go to **Sketch** > **Include Library** > **Manage Libraries**. The Library Manager should open.
+
+Type “**adafruit mpu6050**” on the search box and install the library.
+
+Type “**ESP32Encoder**” on the search box and install the library.
+
+Then, search for “**Adafruit Unified Sensor**”. Scroll all the way down to find the library and install it.
+
+Finally, search for “**Adafruit Bus IO**” and install it
+
+After installing the libraries, restart your Arduino IDE.	
+

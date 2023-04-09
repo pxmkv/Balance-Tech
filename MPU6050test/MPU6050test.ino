@@ -1,50 +1,25 @@
-#include <ESP32Encoder.h>
+// Basic demo for accelerometer readings from Adafruit MPU6050
+
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 
-#define M_PWM 26
-#define M_SW 18
-#define M_Dir 5
-
-ESP32Encoder encoder;
 Adafruit_MPU6050 mpu;
 
-const int m_freq = 2000;
-const int resolution = 8;
-int MAX_PWM_VOLTAGE = 255;
-const int M_Wheel = 1;
-
-float m_error=0;
-float m_error_last=0;
-float m_error_sum=0;
-int m_spd;
-//PID const
-float kp=10;
-float ki=0.1;
-float kd=0.05;
-
-
-void M_Motor(int spd);
-
-void setup() {
+void setup(void) {
   Serial.begin(115200);
-  /* M_Wheel setup */
-  pinMode(M_SW, OUTPUT);
-  pinMode(M_Dir, OUTPUT);
-  ledcSetup(M_Wheel , m_freq, resolution);
-  ledcAttachPin(M_PWM, M_Wheel);
+  while (!Serial)
+    delay(100); // will pause Zero, Leonardo, etc until serial console opens
 
-  
-  ESP32Encoder::useInternalWeakPullResistors = UP; // Enable the weak pull up resistors
-  encoder.attachHalfQuad(19, 23); // Attache pins for use as encoder pins
-  encoder.setCount(0);  // set starting count value after attaching
+  Serial.println("Adafruit MPU6050 test!");
 
-
-  // Try to initialize the MPU!
+  // Try to initialize!
   if (!mpu.begin()) {
     Serial.println("Failed to find MPU6050 chip");
-    while (1) {delay(10);}}
+    while (1) {
+      delay(10);
+    }
+  }
   Serial.println("MPU6050 Found!");
 
   mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
@@ -63,7 +38,6 @@ void setup() {
     Serial.println("+-16G");
     break;
   }
-
   mpu.setGyroRange(MPU6050_RANGE_500_DEG);
   Serial.print("Gyro range set to: ");
   switch (mpu.getGyroRange()) {
@@ -81,7 +55,7 @@ void setup() {
     break;
   }
 
-  mpu.setFilterBandwidth(MPU6050_BAND_5_HZ);
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
   Serial.print("Filter bandwidth set to: ");
   switch (mpu.getFilterBandwidth()) {
   case MPU6050_BAND_260_HZ:
@@ -106,12 +80,14 @@ void setup() {
     Serial.println("5 Hz");
     break;
   }
+
   Serial.println("");
   delay(100);
-
 }
 
 void loop() {
+
+  /* Get new sensor events with the readings */
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
 
@@ -124,26 +100,18 @@ void loop() {
   Serial.print(a.acceleration.z);
   Serial.println(" m/s^2");
 
+  Serial.print("Rotation X: ");
+  Serial.print(g.gyro.x);
+  Serial.print(", Y: ");
+  Serial.print(g.gyro.y);
+  Serial.print(", Z: ");
+  Serial.print(g.gyro.z);
+  Serial.println(" rad/s");
+
+  Serial.print("Temperature: ");
+  Serial.print(temp.temperature);
+  Serial.println(" degC");
+
   Serial.println("");
-
   delay(500);
-}
-
-void M_Motor(int spd){
-  if(spd ==0){digitalWrite(M_SW, LOW);}
-    else if(spd>0){
-      digitalWrite(M_SW, HIGH);
-      digitalWrite(M_Dir, HIGH);
-      ledcWrite(M_Wheel, 255-spd);
-    }
-    else {
-      digitalWrite(M_SW, HIGH);
-      digitalWrite(M_Dir, LOW);
-      ledcWrite(M_Wheel, 255+spd);
-    }
-}
-
-void Self_Balancing(float actual, float target){
-
-
 }
