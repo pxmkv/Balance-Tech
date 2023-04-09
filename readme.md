@@ -12,7 +12,9 @@ M_Encoder GPIO 19, 23
 
 ​	DIR    : GPIO 5
 
+Drive Motor
 
+​	GPIO 35, 33
 
 ### Installing Libraries
 

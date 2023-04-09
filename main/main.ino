@@ -151,6 +151,11 @@ void M_Motor(int spd){
     }
 }
 
+void D_Motor(int spd){
+
+
+}
+
 void Self_Balancing(double input){
   Input = input;
   M_PID.Compute();
