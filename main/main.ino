@@ -125,8 +125,8 @@ void loop() {
   Serial.println(" m/s^2");
 
   Serial.println("");
-
-  delay(500);
+  //M_Motor(a.acceleration.x*20);
+  //delay(500);
 }
 
 void M_Motor(int spd){
