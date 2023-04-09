@@ -7,23 +7,26 @@
 #define M_PWM 26
 #define M_SW 18
 #define M_Dir 5
+#define D1 33
+#define D2 35
+
 
 ESP32Encoder encoder;
 Adafruit_MPU6050 mpu;
 
-const int m_freq = 2000;
+const int m_freq = 20000;
 const int resolution = 8;
 int MAX_PWM_VOLTAGE = 255;
 const int M_Wheel = 1;
-
+const int D_1 = 2;
+const int D_2 = 3;
+const int D_freq = 2000;
 
 double Setpoint, Input, Output;
-PID M_PID(&Input, &Output, &Setpoint, 2 , 2 , 1 , DIRECT);// kp ki kd
+PID M_PID(&Input, &Output, &Setpoint, 10 , 0.4 , 0.1 , DIRECT);// kp ki kd
 
-
-
-
-void M_Motor(int spd);
+double offset=0;
+double MPU_Input;
 
 void setup() {
   Serial.begin(115200);
@@ -33,6 +36,10 @@ void setup() {
   ledcSetup(M_Wheel , m_freq, resolution);
   ledcAttachPin(M_PWM, M_Wheel);
 
+  ledcSetup(D_1, D_freq, resolution);
+  ledcSetup(D_2, D_freq, resolution);
+  ledcAttachPin(D1, D_1);
+  ledcAttachPin(D2, D_2);
   
   ESP32Encoder::useInternalWeakPullResistors = UP; // Enable the weak pull up resistors
   encoder.attachHalfQuad(19, 23); // Attache pins for use as encoder pins
@@ -115,29 +122,25 @@ void setup() {
   M_PID.SetOutputLimits(-255,255);
   M_PID.SetSampleTime(10);
 
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+  offset=a.acceleration.x;
 }
 
 void loop() {
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
-
+  MPU_Input=a.acceleration.x-offset;
   /* Print out the values */
-  Serial.print("Acceleration X: ");
-  Serial.println(a.acceleration.x);
-  /*
-  Serial.print(", Y: ");
-  Serial.print(a.acceleration.y);
-  Serial.print(", Z: ");
-  Serial.print(a.acceleration.z);
-  Serial.println(" m/s^2");
-  */
+  Serial.print("Acceleration: ");
+  Serial.println(MPU_Input);
   Serial.print("");
   //M_Motor(a.acceleration.x*20);
-  //delay(500);
-  Self_Balancing(a.acceleration.x);
+
+  Self_Balancing(MPU_Input);
 }
 
-void M_Motor(int spd){
+void M_Motor(double spd){
   if(spd ==0){digitalWrite(M_SW, LOW);}
     else if(spd>0){
       digitalWrite(M_SW, HIGH);
@@ -151,8 +154,22 @@ void M_Motor(int spd){
     }
 }
 
-void D_Motor(int spd){
+void D_Motor(int speed){
+  if (speed > 0) {
+    ledcWrite(D_1, LOW);
+    ledcWrite(D_2, speed);
+  }
+  else if (speed == 0){
+    ledcWrite(D_1, LOW);
+    ledcWrite(D_2, LOW);
+  }
+  else {
+    ledcWrite(D_2, LOW);
+    ledcWrite(D_1, speed);
+  }
 
+}
+void turning(int degree){
 
 }
 
