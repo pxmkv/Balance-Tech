@@ -2,6 +2,7 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
+#include <PID_v1.h>
 
 #define M_PWM 26
 #define M_SW 18
@@ -15,14 +16,11 @@ const int resolution = 8;
 int MAX_PWM_VOLTAGE = 255;
 const int M_Wheel = 1;
 
-float m_error=0;
-float m_error_last=0;
-float m_error_sum=0;
-int m_spd;
-//PID const
-float kp=10;
-float ki=0.1;
-float kd=0.05;
+
+double Setpoint, Input, Output;
+PID M_PID(&Input, &Output, &Setpoint, 2 , 2 , 1 , DIRECT);// kp ki kd
+
+
 
 
 void M_Motor(int spd);
@@ -109,6 +107,14 @@ void setup() {
   Serial.println("");
   delay(100);
 
+
+/*PID Controller*/
+  Input=0;
+  Setpoint=0;
+  M_PID.SetMode(AUTOMATIC);
+  M_PID.SetOutputLimits(-255,255);
+  M_PID.SetSampleTime(10);
+
 }
 
 void loop() {
@@ -117,16 +123,18 @@ void loop() {
 
   /* Print out the values */
   Serial.print("Acceleration X: ");
-  Serial.print(a.acceleration.x);
+  Serial.println(a.acceleration.x);
+  /*
   Serial.print(", Y: ");
   Serial.print(a.acceleration.y);
   Serial.print(", Z: ");
   Serial.print(a.acceleration.z);
   Serial.println(" m/s^2");
-
-  Serial.println("");
+  */
+  Serial.print("");
   //M_Motor(a.acceleration.x*20);
   //delay(500);
+  Self_Balancing(a.acceleration.x);
 }
 
 void M_Motor(int spd){
@@ -143,7 +151,8 @@ void M_Motor(int spd){
     }
 }
 
-void Self_Balancing(float actual, float target){
-
-
+void Self_Balancing(double input){
+  Input = input;
+  M_PID.Compute();
+  M_Motor(Output);
 }
