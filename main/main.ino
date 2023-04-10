@@ -124,13 +124,13 @@ void setup() {
 
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
-  offset=a.acceleration.x;
+  offset=a.acceleration.y;
 }
 
 void loop() {
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
-  MPU_Input=a.acceleration.x-offset;
+  MPU_Input=a.acceleration.y-offset;
   /* Print out the values */
   Serial.print("Acceleration: ");
   Serial.println(MPU_Input);
