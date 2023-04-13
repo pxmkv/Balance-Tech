@@ -23,7 +23,7 @@ const int D_2 = 3;
 const int D_freq = 2000;
 
 double Setpoint, Input, Output;
-PID M_PID(&Input, &Output, &Setpoint, 10 , 0.4 , 0.1 , DIRECT);// kp ki kd
+PID M_PID(&Input, &Output, &Setpoint, 8 , 2 , 1 , DIRECT);// kp ki kd
 
 double offset=0;
 double MPU_Input;
@@ -130,10 +130,11 @@ void setup() {
 void loop() {
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
-  MPU_Input=a.acceleration.y-offset;
+  MPU_Input=(a.acceleration.y-offset)*1;
   /* Print out the values */
   Serial.print("Acceleration: ");
-  Serial.println(MPU_Input);
+//  Serial.println(MPU_Input);
+  Serial.println(Output);
   Serial.print("");
   //M_Motor(a.acceleration.x*20);
 
