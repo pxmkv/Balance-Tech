@@ -3,6 +3,7 @@
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
 #include <PID_v1.h>
+#include <Servo.h>
 
 #define M_PWM 26
 #define M_SW 18

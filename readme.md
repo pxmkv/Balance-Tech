@@ -18,15 +18,21 @@ Drive Motor
 
 ### Installing Libraries
 
-Open your Arduino IDE and go to **Sketch** > **Include Library** > **Manage Libraries**. The Library Manager should open.
+Open your Arduino IDE and go to **Sketch** > **Include Library** > **Manage Libraries**. The Library Manager should open. Search and install those libraries.
 
-Type “**adafruit mpu6050**” on the search box and install the library.
+**adafruit mpu6050**
 
-Type “**ESP32Encoder**” on the search box and install the library.
+**ESP32Encoder**
 
-Then, search for “**Adafruit Unified Sensor**”. Scroll all the way down to find the library and install it.
+**Adafruit Unified Sensor**
 
-Finally, search for “**Adafruit Bus IO**” and install it
+**Adafruit Bus IO**
+
+**ESP32Servo by Kavin Harrington**
+
+**PID by Brett**
 
 After installing the libraries, restart your Arduino IDE.	
+
+
 
