@@ -15,6 +15,8 @@ M_Encoder GPIO 19, 23
 Drive Motor
 
 ​	GPIO 35, 33
+Servo Motor
+​	GPIO 12
 
 ### Installing Libraries
 
