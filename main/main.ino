@@ -24,7 +24,11 @@ const int D_2 = 3;
 const int D_freq = 2000;
 
 double Setpoint, Input, Output;
-PID M_PID(&Input, &Output, &Setpoint, 80 , 0 , 10 , DIRECT);// kp ki kd
+float kp=80;
+float ki=0;
+float kd=10;
+
+PID M_PID(&Input, &Output, &Setpoint, kp , ki , kd , DIRECT);// kp ki kd
 
 double offset=0;
 double MPU_Input;
@@ -129,6 +133,39 @@ void setup() {
 }
 
 void loop() {
+  if (Serial.available()) {
+    String reading = Serial.readStringUntil('\n');  // read from the Serial Monitor
+    /* put your code here*/
+    switch (reading[0]){
+    case 'p':
+      reading[0]=' ';
+      reading.trim();
+      kp=reading.toFloat();
+      M_PID.SetTunings(kp, ki, kd);
+      Serial.println("kp = " + String(kp) + ", ki = " + String(ki) + ", kd = " + String(kd));
+      break;
+    case 'i':
+      reading[0]=' ';
+      reading.trim();
+      ki=reading.toFloat();
+      M_PID.SetTunings(kp, ki, kd);
+      Serial.println("kp = " + String(kp) + ", ki = " + String(ki) + ", kd = " + String(kd));
+      break;
+    case 'd':
+      reading[0]=' ';
+      reading.trim();
+      kd=reading.toFloat();
+      M_PID.SetTunings(kp, ki, kd);
+      Serial.println("kp = " + String(kp) + ", ki = " + String(ki) + ", kd = " + String(kd));
+      break;    
+    default:
+      Serial.println("kp = " + String(kp) + ", ki = " + String(ki) + ", kd = " + String(kd));
+      break;
+      }
+  }
+
+
+
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
   MPU_Input=(a.acceleration.x-offset)*1;
