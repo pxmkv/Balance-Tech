@@ -14,6 +14,8 @@
 MPU6050 accelgyro;
 ESP32Encoder encoder;
 
+float count;
+float theta_dotWheel=0;
 
 const int m_freq = 20000;
 const int resolution = 8;
@@ -26,9 +28,9 @@ const int ledChannel_2 = 3;
 const int D_freq = 5000;
 
 double Setpoint, Input, Output;
-float kp=10;
+float kp=4;
 float ki=0;
-float kd=1;
+float kd=0.1;
 
 
 unsigned long now, lastTime = 0;
@@ -62,7 +64,7 @@ void setup() {
   /* M_Wheel setup */
   pinMode(M_SW, OUTPUT);
   pinMode(M_Dir, OUTPUT);
-  ledcSetup(M_Wheel , m_freq, resolution);
+  ledcSetup(M_Wheel , m_freq, 9);
   ledcAttachPin(M_PWM, M_Wheel);
 
   ledcSetup(ledChannel_1, D_freq, resolution);
@@ -91,10 +93,10 @@ void setup() {
 
 /*PID Controller*/
   Input=0;
-  Setpoint=0;
+  Setpoint=0.2;
   M_PID.SetMode(AUTOMATIC);
-  M_PID.SetOutputLimits(-255,255);
-  M_PID.SetSampleTime(10);
+  M_PID.SetOutputLimits(-512,512);
+  M_PID.SetSampleTime(10); // sample time for PID
 }
 
 void loop() {
@@ -209,24 +211,30 @@ void loop() {
   Serial.print("Acceleration: ");
   Serial.print(MPU_Input);Serial.print(",");
   Serial.print(Output);
-  Serial.println();
-  //M_Motor(200);
+  Serial.print(",");
+ 
+  
+  theta_dotWheel = (encoder.getCount()-count) * 3.6 / dt;
+  count=encoder.getCount();
+  Serial.print(Output+theta_dotWheel*0.001);
+   Serial.println();
+  //M_Motor(-200);
   Self_Balancing(MPU_Input);
 }
 
 void M_Motor(double spd){
   spd=spd;
-  if (abs(MPU_Input)<0.2)spd=0;
-  if(spd ==0){digitalWrite(M_SW, LOW);}
+  if (abs(MPU_Input)>20)spd=0;
+  if(spd ==0){digitalWrite(M_SW, LOW);ledcWrite(M_Wheel, 511);}
     else if(spd>0){
       digitalWrite(M_SW, HIGH);
       digitalWrite(M_Dir, HIGH);
-      ledcWrite(M_Wheel, 255-spd);
+      ledcWrite(M_Wheel, 512-spd);
     }
     else {
       digitalWrite(M_SW, HIGH);
       digitalWrite(M_Dir, LOW);
-      ledcWrite(M_Wheel, 255+spd);
+      ledcWrite(M_Wheel, 512+spd);
     }
 }
 
@@ -248,5 +256,7 @@ void turning(int degree){
 void Self_Balancing(double input){
   Input = input;
   M_PID.Compute();
-  M_Motor(Output);
+  float outputs=Output+theta_dotWheel*0.001;
+
+  M_Motor(outputs);
 }
