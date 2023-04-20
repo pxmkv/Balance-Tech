@@ -2,7 +2,7 @@
 #include "Wire.h"
 #include "I2Cdev.h"
 #include "MPU6050.h"
-#include <PID_v1.h>
+
 //#include <Servo.h>
 
 #define M_PWM 26
@@ -13,8 +13,8 @@
 
 MPU6050 accelgyro;
 ESP32Encoder encoder;
-
-float count;
+float v_gyrox;
+long enc_count;
 float theta_dotWheel=0;
 
 const int m_freq = 20000;
@@ -27,11 +27,10 @@ const int ledChannel_2 = 3;
 
 const int D_freq = 5000;
 
-double Setpoint, Input, Output;
-float kp=4;
-float ki=0;
-float kd=0.1;
+int16_t motor_speed;
+int32_t motor_pos;
 
+int counter=0;
 
 unsigned long now, lastTime = 0;
 float dt;                                   
@@ -53,18 +52,26 @@ float a_x[10]={0}, a_y[10]={0} ,g_x[10]={0} ,g_y[10]={0}; //variance
 float Px=1, Rx, Kx, Sx, Vx, Qx;             //Kalman variable for x
 float Py=1, Ry, Ky, Sy, Vy, Qy;             //Kalman variable for y
 
+float MPU_Input;
 
-PID M_PID(&Input, &Output, &Setpoint, kp , ki , kd , DIRECT);// kp ki kd
+/*LQR Const*/
+float K1 = 140;
+float K2 = 17.00;
+float K3 = 8.00;
+float K4 = 0.60;
+long currentT, previousT_1, previousT_2 = 0;  
+float loop_time=10;
 
-double current_speed=0;
-double MPU_Input;
+float gyroXfilt;
+
+
 
 void setup() {
   Serial.begin(115200);
   /* M_Wheel setup */
   pinMode(M_SW, OUTPUT);
   pinMode(M_Dir, OUTPUT);
-  ledcSetup(M_Wheel , m_freq, 9);
+  ledcSetup(M_Wheel , m_freq, resolution);
   ledcAttachPin(M_PWM, M_Wheel);
 
   ledcSetup(ledChannel_1, D_freq, resolution);
@@ -91,51 +98,87 @@ void setup() {
   gxo /= times; gyo /= times; gzo /= times;
   
 
-/*PID Controller*/
-  Input=0;
-  Setpoint=0.2;
-  M_PID.SetMode(AUTOMATIC);
-  M_PID.SetOutputLimits(-512,512);
-  M_PID.SetSampleTime(10); // sample time for PID
+
+
+
 }
 
 void loop() {
-/*Updating PID*/
+  currentT = millis();
   
-  if (Serial.available()) {
-    String reading = Serial.readStringUntil('\n');  // read from the Serial Monitor
-    /* put your code here*/
-    switch (reading[0]){
-    case 'p':
-      reading[0]=' ';
-      reading.trim();
-      kp=reading.toFloat();
-      M_PID.SetTunings(kp, ki, kd);
-      Serial.println("kp = " + String(kp) + ", ki = " + String(ki) + ", kd = " + String(kd));
-      break;
-    case 'i':
-      reading[0]=' ';
-      reading.trim();
-      ki=reading.toFloat();
-      M_PID.SetTunings(kp, ki, kd);
-      Serial.println("kp = " + String(kp) + ", ki = " + String(ki) + ", kd = " + String(kd));
-      break;
-    case 'd':
-      reading[0]=' ';
-      reading.trim();
-      kd=reading.toFloat();
-      M_PID.SetTunings(kp, ki, kd);
-      Serial.println("kp = " + String(kp) + ", ki = " + String(ki) + ", kd = " + String(kd));
-      break;    
-    default:
-      Serial.println("kp = " + String(kp) + ", ki = " + String(ki) + ", kd = " + String(kd));
-      break;
-      }
-  }
+  if (currentT - previousT_1 >= loop_time) {
+  
+  Kalman_filter();
+  MPU_Input=agx;
+
+
+  enc_count=encoder.getCount();
+  motor_speed=enc_count;
+  encoder.setCount(0);
+
+  gyroXfilt = 0.4 * v_gyrox + (1 - 0.4) * gyroXfilt;
+
+  motor_pos += motor_speed;
+  motor_pos = constrain(motor_pos, -110, 110);
+
+int pwm = constrain(K1 * MPU_Input + K2 * v_gyrox + K3 * motor_speed + K4 * motor_pos, -255, 255); 
+      M_Motor(-pwm);
 
 
 
-  unsigned long now = millis();             //Current time(ms)
+
+
+
+
+
+
+
+
+
+
+
+  //aax, aay, agx, agy, agz
+  /* Print out the values */
+  if (counter>10){
+  Serial.print("Acceleration: ");
+  Serial.print(MPU_Input);Serial.print(",");
+  //Serial.print(enc_count);
+  Serial.print(motor_speed);Serial.print(",");
+  //Serial.print(-pwm);Serial.print(",");
+  
+  Serial.println();counter=0;
+  }counter++;
+  
+  //theta_dotWheel = (encoder.getCount()-count) * 3.6 / dt;
+  
+
+   
+  //M_Motor(50);
+
+  //int pwm = constrain(K1 * MPU_Input + K2 * v_gyrox + K3 * motor_speed + K4 * motor_pos, -255, 255); 
+    //  M_Motor(-pwm);
+
+
+  previousT_1 = currentT;
+}}
+
+void M_Motor(double spd){
+  spd=spd;
+  if (abs(MPU_Input)>20)spd=0;
+  if(spd ==0){digitalWrite(M_SW, LOW);ledcWrite(M_Wheel, 511);}
+    else if(spd>0){
+      digitalWrite(M_SW, HIGH);
+      digitalWrite(M_Dir, HIGH);
+      ledcWrite(M_Wheel, 255-spd);
+    }
+    else {
+      digitalWrite(M_SW, HIGH);
+      digitalWrite(M_Dir, LOW);
+      ledcWrite(M_Wheel, 255+spd);
+    }
+}
+void Kalman_filter(){
+    unsigned long now = millis();             //Current time(ms)
   dt = (now - lastTime) / 1000.0;           //dt(s)
   lastTime = now;                           //last sampled time(ms)
 
@@ -201,43 +244,8 @@ void loop() {
   Py = (1 - Ky) * Py;
 
   /* kalmen end */
-
-
-
-
-
-  MPU_Input=agx;
-  /* Print out the values */
-  Serial.print("Acceleration: ");
-  Serial.print(MPU_Input);Serial.print(",");
-  Serial.print(Output);
-  Serial.print(",");
- 
-  
-  theta_dotWheel = (encoder.getCount()-count) * 3.6 / dt;
-  count=encoder.getCount();
-  Serial.print(current_speed);
-   Serial.println();
-  //M_Motor(50);
-  Self_Balancing(MPU_Input);
+  v_gyrox=gyrox;
 }
-
-void M_Motor(double spd){
-  spd=spd;
-  if (abs(MPU_Input)>20)spd=0;
-  if(spd ==0){digitalWrite(M_SW, LOW);ledcWrite(M_Wheel, 511);}
-    else if(spd>0){
-      digitalWrite(M_SW, HIGH);
-      digitalWrite(M_Dir, HIGH);
-      ledcWrite(M_Wheel, 512-spd);
-    }
-    else {
-      digitalWrite(M_SW, HIGH);
-      digitalWrite(M_Dir, LOW);
-      ledcWrite(M_Wheel, 512+spd);
-    }
-}
-
 void D_Motor(int spd){
   spd=spd;
   if (spd > 0) {
@@ -254,11 +262,39 @@ void turning(int degree){
 }
 
 void Self_Balancing(double input){
-  Input = input;
-  M_PID.Compute();
-  float outputs=Output+theta_dotWheel*0.001;
-  current_speed+=outputs/255;
-  if(current_speed>512){current_speed=512;}
-  if(current_speed<-512){current_speed=-512;}
-  M_Motor(current_speed);
+
+}
+
+
+
+int Tuning() {
+  if (!Serial.available())  return 0;
+  delay(2);
+  char param = Serial.read();               // get parameter byte
+  if (!Serial.available()) return 0;
+  char cmd = Serial.read();                 // get command byte
+  Serial.flush();
+  switch (param) {
+    case 'p':
+      if (cmd == '+')    K1 += 1;
+      if (cmd == '-')    K1 -= 1;
+      Serial.println(K1);
+      break;
+    case 'i':
+      if (cmd == '+')    K2 += 0.5;
+      if (cmd == '-')    K2 -= 0.5;
+      Serial.println(K2);
+      break;
+    case 's':
+      if (cmd == '+')    K3 += 0.2;
+      if (cmd == '-')    K3 -= 0.2;
+      Serial.println(K3);
+      break;  
+    case 'a':
+      if (cmd == '+')    K4 += 0.05;
+      if (cmd == '-')    K4 -= 0.05;
+      Serial.println(K4);
+      break;                  
+   }
+   return 1;
 }
