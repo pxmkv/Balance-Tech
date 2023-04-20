@@ -53,22 +53,21 @@ float Px=1, Rx, Kx, Sx, Vx, Qx;             //Kalman variable for x
 float Py=1, Ry, Ky, Sy, Vy, Qy;             //Kalman variable for y
 
 float MPU_Input;
-int pos = 107;    // variable to store the servo position
-// Recommended PWM GPIO pins on the ESP32 include 2,4,12-19,21-23,25-27,32-33 
-int servoPin = 17;
 
 /*LQR Const*/
-float offset=1.85;
+float offset=1.5;
+
 float K1 = 160;
 float K2 = 25.00;
 float K3 = 12.00;
 float K4 = 0.60;
 long currentT, previousT_1, previousT_2 = 0;  
 float loop_time=10;
-
 float gyroXfilt;
 
-
+int pos = 107;    // variable to store the servo position
+// Recommended PWM GPIO pins on the ESP32 include 2,4,12-19,21-23,25-27,32-33 
+int servoPin = 17;
 
 void setup() {
   Serial.begin(115200);
@@ -83,8 +82,7 @@ void setup() {
   ledcAttachPin(D1, ledChannel_1);
   ledcAttachPin(D2, ledChannel_2);
 
-  myservo.attach(servoPin);
-  
+
   ESP32Encoder::useInternalWeakPullResistors = UP; // Enable the weak pull up resistors
   encoder.attachHalfQuad(19, 23); // Attache pins for use as encoder pins
   encoder.setCount(0);  // set starting count value after attaching
@@ -104,55 +102,50 @@ void setup() {
   
 
 
+
+
 }
 
 void loop() {
-  //myservo.write(pos);  
-
   currentT = millis();
-  if (currentT - previousT_1 >= loop_time) {
   Set_K_value();
+  
+  if (currentT - previousT_1 >= loop_time) {
+  
   Kalman_filter();
   MPU_Input=agx+offset;
+
+
   enc_count=encoder.getCount();
   motor_speed=enc_count;
   encoder.setCount(0);
+
   gyroXfilt = 0.4 * v_gyrox + (1 - 0.4) * gyroXfilt;
+
   motor_pos += motor_speed;
   motor_pos = constrain(motor_pos, -110, 110);
+
   int pwm = constrain(K1 * MPU_Input + K2 * gyroXfilt + K3 * motor_speed + K4 * motor_pos, -255, 255); 
   M_Motor(-pwm);
-
   //aax, aay, agx, agy, agz
+  /* Print out the values */
   if (counter>8){
   Serial.print("AGX: ");
   Serial.print(MPU_Input);Serial.print(",");
   Serial.print(v_gyrox);Serial.print(",");
   Serial.print(gyroXfilt);Serial.print(",");
+  
   Serial.print(motor_speed);Serial.print(",");
   Serial.print(-pwm);//Serial.print(",");
+  
   Serial.println();counter=0;
   }counter++;
+
   previousT_1 = currentT;
 }}
 
-void M_Motor(double spd){
-  spd=spd;
-  if (abs(MPU_Input)>20)spd=0;
-  if(spd ==0){digitalWrite(M_SW, LOW);ledcWrite(M_Wheel, 511);}
-    else if(spd>0){
-      digitalWrite(M_SW, HIGH);
-      digitalWrite(M_Dir, HIGH);
-      ledcWrite(M_Wheel, 255-spd);
-    }
-    else {
-      digitalWrite(M_SW, HIGH);
-      digitalWrite(M_Dir, LOW);
-      ledcWrite(M_Wheel, 255+spd);
-    }
-}
 void Kalman_filter(){
-    unsigned long now = millis();             //Current time(ms)
+  unsigned long now = millis();             //Current time(ms)
   dt = (now - lastTime) / 1000.0;           //dt(s)
   lastTime = now;                           //last sampled time(ms)
 
@@ -220,6 +213,7 @@ void Kalman_filter(){
   /* kalmen end */
   v_gyrox=gyrox;
 }
+
 void D_Motor(int spd){
   spd=spd;
   if (spd > 0) {
@@ -231,11 +225,25 @@ void D_Motor(int spd){
     ledcWrite(ledChannel_1, -spd);
   }
 }
-void turning(int degree){
 
+
+void M_Motor(double spd){
+  spd=spd;
+  if (abs(MPU_Input)>22)spd=0;
+  if(spd ==0){digitalWrite(M_SW, LOW);ledcWrite(M_Wheel, 511);}
+    else if(spd>0){
+      digitalWrite(M_SW, HIGH);
+      digitalWrite(M_Dir, HIGH);
+      ledcWrite(M_Wheel, 255-spd);
+    }
+    else {
+      digitalWrite(M_SW, HIGH);
+      digitalWrite(M_Dir, LOW);
+      ledcWrite(M_Wheel, 255+spd);
+    }
 }
 
-void Self_Balancing(double input){
+void turning(int degree){
 
 }
 
