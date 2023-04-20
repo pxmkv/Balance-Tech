@@ -22,19 +22,21 @@ Servo Motor
 
 Open your Arduino IDE and go to **Sketch** > **Include Library** > **Manage Libraries**. The Library Manager should open. Search and install those libraries.
 
-**adafruit mpu6050**
+**mpu6050**
 
 **ESP32Encoder**
 
 **Adafruit Unified Sensor**
 
-**Adafruit Bus IO**
+**Wire.h**
 
 **ESP32Servo by Kavin Harrington**
 
-**PID by Brett**
+**I2Cdev.ht**
 
 After installing the libraries, restart your Arduino IDE.	
 
 
+
+LQR Reference https://github.com/remrc/Self-Balancing-Bike
 
