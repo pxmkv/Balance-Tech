@@ -2,8 +2,8 @@
 #include "Wire.h"
 #include "I2Cdev.h"
 #include "MPU6050.h"
+#include <ESP32Servo.h>
 
-//#include <Servo.h>
 
 #define M_PWM 26
 #define M_SW 18
@@ -55,9 +55,10 @@ float Py=1, Ry, Ky, Sy, Vy, Qy;             //Kalman variable for y
 float MPU_Input;
 
 /*LQR Const*/
-float K1 = 140;
-float K2 = 17.00;
-float K3 = 8.00;
+float offset=1.85;
+float K1 = 160;
+float K2 = 25.00;
+float K3 = 12.00;
 float K4 = 0.60;
 long currentT, previousT_1, previousT_2 = 0;  
 float loop_time=10;
@@ -105,11 +106,12 @@ void setup() {
 
 void loop() {
   currentT = millis();
+  Set_K_value();
   
   if (currentT - previousT_1 >= loop_time) {
   
   Kalman_filter();
-  MPU_Input=agx;
+  MPU_Input=agx+offset;
 
 
   enc_count=encoder.getCount();
@@ -121,30 +123,19 @@ void loop() {
   motor_pos += motor_speed;
   motor_pos = constrain(motor_pos, -110, 110);
 
-int pwm = constrain(K1 * MPU_Input + K2 * v_gyrox + K3 * motor_speed + K4 * motor_pos, -255, 255); 
+int pwm = constrain(K1 * MPU_Input + K2 * gyroXfilt + K3 * motor_speed + K4 * motor_pos, -255, 255); 
       M_Motor(-pwm);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   //aax, aay, agx, agy, agz
   /* Print out the values */
-  if (counter>10){
-  Serial.print("Acceleration: ");
+  if (counter>8){
+  Serial.print("AGX: ");
   Serial.print(MPU_Input);Serial.print(",");
-  //Serial.print(enc_count);
+  Serial.print(v_gyrox);Serial.print(",");
+  Serial.print(gyroXfilt);Serial.print(",");
+  
   Serial.print(motor_speed);Serial.print(",");
-  //Serial.print(-pwm);Serial.print(",");
+  Serial.print(-pwm);//Serial.print(",");
   
   Serial.println();counter=0;
   }counter++;
@@ -267,34 +258,43 @@ void Self_Balancing(double input){
 
 
 
-int Tuning() {
-  if (!Serial.available())  return 0;
-  delay(2);
-  char param = Serial.read();               // get parameter byte
-  if (!Serial.available()) return 0;
-  char cmd = Serial.read();                 // get command byte
-  Serial.flush();
-  switch (param) {
-    case 'p':
-      if (cmd == '+')    K1 += 1;
-      if (cmd == '-')    K1 -= 1;
-      Serial.println(K1);
-      break;
-    case 'i':
-      if (cmd == '+')    K2 += 0.5;
-      if (cmd == '-')    K2 -= 0.5;
-      Serial.println(K2);
+void Set_K_value() {
+
+  if (Serial.available()) {
+    String reading = Serial.readStringUntil('\n');  // read from the Serial Monitor
+    /* put your code here*/
+    switch (reading[0]){
+    case 'a':
+      reading[0]=' ';
+      reading.trim();
+      K1=reading.toFloat();
+      Serial.println("k1 = " + String(K1) + ", k2 = " + String(K2) + ", k3 = " + String(K3) + ", k4 = " + String(K4));
       break;
     case 's':
-      if (cmd == '+')    K3 += 0.2;
-      if (cmd == '-')    K3 -= 0.2;
-      Serial.println(K3);
+      reading[0]=' ';
+      reading.trim();
+      K2=reading.toFloat();
+      
+      Serial.println("k1 = " + String(K1) + ", k2 = " + String(K2) + ", k3 = " + String(K3) + ", k4 = " + String(K4));
+      break;
+    case 'd':
+      reading[0]=' ';
+      reading.trim();
+      K3=reading.toFloat();
+      
+      Serial.println("k1 = " + String(K1) + ", k2 = " + String(K2) + ", k3 = " + String(K3) + ", k4 = " + String(K4));
+      break;    
+    case 'f':
+      reading[0]=' ';
+      reading.trim();
+      K4=reading.toFloat();
+      Serial.println("k1 = " + String(K1) + ", k2 = " + String(K2) + ", k3 = " + String(K3) + ", k4 = " + String(K4));
       break;  
-    case 'a':
-      if (cmd == '+')    K4 += 0.05;
-      if (cmd == '-')    K4 -= 0.05;
-      Serial.println(K4);
-      break;                  
-   }
-   return 1;
+    default:
+      Serial.println("k1 = " + String(K1) + ", k2 = " + String(K2) + ", k3 = " + String(K3) + ", k4 = " + String(K4));
+      break;
+      }
+  }
+
+  
 }
