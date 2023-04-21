@@ -36,6 +36,3 @@ Open your Arduino IDE and go to **Sketch** > **Include Library** > **Manage Libr
 After installing the libraries, restart your Arduino IDE.	
 
 
-
-LQR Reference https://github.com/remrc/Self-Balancing-Bike
-
