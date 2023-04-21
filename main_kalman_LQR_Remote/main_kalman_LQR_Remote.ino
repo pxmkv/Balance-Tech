@@ -56,7 +56,7 @@ float MPU_Input;
 float offset=0;
 
 float K1 = 160;
-float K2 = 25.00;
+float K2 = 15.00;
 float K3 = 12.00;
 float K4 = 0.60;
 long currentT, previousT_1, previousT_2 = 0;  
@@ -217,7 +217,7 @@ void Kalman_filter(){
   Py = (1 - Ky) * Py;
 
   /* kalmen end */
-  v_gyrox=-gyrox;
+  v_gyrox=-gyrox*1000/loop_time;
 }
 
 void D_Motor(int spd){
