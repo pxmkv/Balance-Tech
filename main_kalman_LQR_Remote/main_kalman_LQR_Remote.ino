@@ -115,6 +115,7 @@ void setup() {
   xTaskCreatePinnedToCore(remote, "remote function", 10000, NULL, 1, NULL,  0); // CPU Core 0
 }
 
+
 void loop() {//CPU Core 1
  
   currentT = millis();
@@ -148,7 +149,9 @@ void loop() {//CPU Core 1
   }counter++;
 
   previousT_1 = currentT;
-}}
+  
+  }
+}
 
 void Kalman_filter(){
 
@@ -284,7 +287,9 @@ void onDisconnectedGamepad(GamepadPtr gp) {
         Serial.println("CALLBACK: Gamepad disconnected, but not found in myGamepads");
     }
 }
+
 void turn(int position){ledcWrite(servoChannel, map(position, 0, 180, 5, 32));}
+
 void remote(void * parameter){
   while(1){
     BP32.update();
