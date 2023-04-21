@@ -2,16 +2,14 @@
 #include "Wire.h"
 #include "I2Cdev.h"
 #include "MPU6050.h"
-#include <ESP32Servo.h>
 #include <Bluepad32.h>
-#include "esp32-hal-cpu.h"
 
-
+#define ledPin 2
 #define M_PWM 26
 #define M_SW 18
 #define M_Dir 5
 #define D1 33
-#define D2 35
+#define D2 4
 
 GamepadPtr myGamepads[BP32_MAX_GAMEPADS];
 
@@ -24,16 +22,16 @@ const int m_freq = 20000;
 const int resolution = 8;
 int MAX_PWM_VOLTAGE = 255;
 const int M_Wheel = 1;
-
-const int ledChannel_1 = 2;
-const int ledChannel_2 = 3;
-
+const int DChannel_1 = 2;
+const int DChannel_2 = 3;
+const int servoChannel = 4;
+const int servo_freq = 50;
 const int D_freq = 5000;
 
 int16_t motor_speed;
 int32_t motor_pos;
 
-int counter=0;                               
+                             
 
 int16_t ax, ay, az, gx, gy, gz;             //raw data from mpu6050
 float aax=0, aay=0, agx=0, agy=0, agz=0;    //angle var
@@ -65,29 +63,31 @@ long currentT, previousT_1, previousT_2 = 0;
 float loop_time=10;
 float gyroXfilt;
 
-int pos = 107;    // variable to store the servo position
-// Recommended PWM GPIO pins on the ESP32 include 2,4,12-19,21-23,25-27,32-33 
+
+
 int servoPin = 17;
 
 
+int counter=0;  
+
 void setup() {
   Serial.begin(115200);
-  Serial.printf("Firmware: %s\n", BP32.firmwareVersion());
-  setCpuFrequencyMhz(240);
-  Serial.println(getCpuFrequencyMhz());
-
 
   /* M_Wheel setup */
+  pinMode(ledPin, OUTPUT);
   pinMode(M_SW, OUTPUT);
   pinMode(M_Dir, OUTPUT);
   ledcSetup(M_Wheel , m_freq, resolution);
   ledcAttachPin(M_PWM, M_Wheel);
 
-  ledcSetup(ledChannel_1, D_freq, resolution);
-  ledcSetup(ledChannel_2, D_freq, resolution);
-  ledcAttachPin(D1, ledChannel_1);
-  ledcAttachPin(D2, ledChannel_2);
+  ledcSetup(DChannel_1, D_freq, resolution);
+  ledcSetup(DChannel_2, D_freq, resolution);
+  ledcAttachPin(D1, DChannel_1);
+  ledcAttachPin(D2, DChannel_2);
 
+  ledcSetup(servoChannel, servo_freq, resolution);
+  ledcAttachPin(servoPin, servoChannel);
+  
 
   ESP32Encoder::useInternalWeakPullResistors = UP; // Enable the weak pull up resistors
   encoder.attachHalfQuad(19, 23); // Attache pins for use as encoder pins
@@ -95,8 +95,9 @@ void setup() {
 
 /*Initial MPU */
   Wire.begin();
-  accelgyro.initialize();                
-
+  accelgyro.initialize();   
+               
+/*Initial Kalman Filter*/
   unsigned short times = 200;             //sample times
   for(int i=0;i<times;i++){
     accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz); //read raw data from mpu
@@ -106,50 +107,43 @@ void setup() {
   axo /= times; ayo /= times; azo /= times; //calculate offset
   gxo /= times; gyo /= times; gzo /= times;
   
+
+
+
   BP32.setup(&onConnectedGamepad, &onDisconnectedGamepad);
   BP32.forgetBluetoothKeys();
-  xTaskCreatePinnedToCore(remote, "remote function", 10000, NULL, 1, NULL,  0) // running in core 0
+  xTaskCreatePinnedToCore(remote, "remote function", 10000, NULL, 1, NULL,  0); // CPU Core 0
 }
 
-void loop() {
+void loop() {//CPU Core 1
+ 
   currentT = millis();
   Set_K_value(); // a=k1 s=k2 d=k3 f=k4 o=offset c=calibrate
 
-  //remote();
-
 
   if (currentT - previousT_1 >= loop_time) {
-  
-  
-
-
-
   Kalman_filter();
   MPU_Input=-agx+offset;
-
-
   enc_count=encoder.getCount();
   motor_speed=enc_count;
   encoder.setCount(0);
-
   gyroXfilt = 0.4 * v_gyrox + (1 - 0.4) * gyroXfilt;
-
   motor_pos += motor_speed;
   motor_pos = constrain(motor_pos, -110, 110);
 
-  int pwm = constrain(K1 * MPU_Input + K2 * gyroXfilt + K3 * motor_speed + K4 * motor_pos, -255, 255); 
+  int pwm = constrain(K1 * MPU_Input + K2 * gyroXfilt + K3 * motor_speed + K4 * motor_pos, -255, 255); //Linear–quadratic regulator
   M_Motor(-pwm);
+  
   //aax, aay, agx, agy, agz
   /* Print out the values */
+  
   if (counter>5){
   Serial.print("AGX: ");
   Serial.print(MPU_Input);Serial.print(",");
   Serial.print(v_gyrox);Serial.print(",");
   Serial.print(gyroXfilt);Serial.print(",");
-  
   Serial.print(motor_speed);Serial.print(",");
   Serial.print(-pwm);//Serial.print(",");
-  
   Serial.println();counter=0;
   }counter++;
 
@@ -157,7 +151,6 @@ void loop() {
 }}
 
 void Kalman_filter(){
-               //last sampled time(ms)
 
   accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz); //raw data from MPU
 
@@ -227,12 +220,12 @@ void Kalman_filter(){
 void D_Motor(int spd){
   spd=spd;
   if (spd > 0) {
-    ledcWrite(ledChannel_1, LOW);
-    ledcWrite(ledChannel_2, spd);
+    ledcWrite(DChannel_1, LOW);
+    ledcWrite(DChannel_2, spd);
   }
   else {
-    ledcWrite(ledChannel_2, LOW);
-    ledcWrite(ledChannel_1, -spd);
+    ledcWrite(DChannel_2, LOW);
+    ledcWrite(DChannel_1, -spd);
   }
 }
 
@@ -252,6 +245,7 @@ void M_Motor(double spd){
       ledcWrite(M_Wheel, 255+spd);
     }
 }
+
 
 void onConnectedGamepad(GamepadPtr gp) {
     bool foundEmptySlot = false;
@@ -273,6 +267,7 @@ void onConnectedGamepad(GamepadPtr gp) {
     }
 }
 
+
 void onDisconnectedGamepad(GamepadPtr gp) {
     bool foundGamepad = false;
 
@@ -289,66 +284,29 @@ void onDisconnectedGamepad(GamepadPtr gp) {
         Serial.println("CALLBACK: Gamepad disconnected, but not found in myGamepads");
     }
 }
-
+void turn(int position){ledcWrite(servoChannel, map(position, 0, 180, 5, 32));}
 void remote(void * parameter){
-  
-while(1){
-
+  while(1){
     BP32.update();
-
     // It is safe to always do this before using the gamepad API.
     // This guarantees that the gamepad is valid and connected.
     for (int i = 0; i < BP32_MAX_GAMEPADS; i++) {
         GamepadPtr myGamepad = myGamepads[i];
 
         if (myGamepad && myGamepad->isConnected()) {
+            digitalWrite(ledPin,HIGH);
             // There are different ways to query whether a button is pressed.
             // By query each button individually:
             //  a(), b(), x(), y(), l1(), etc...
-            if (myGamepad->a()) {
-                static int colorIdx = 0;
-                // Some gamepads like DS4 and DualSense support changing the color LED.
-                // It is possible to change it by calling:
-                switch (colorIdx % 3) {
-                    case 0:
-                        // Red
-                        myGamepad->setColorLED(255, 0, 0);
-                        break;
-                    case 1:
-                        // Green
-                        myGamepad->setColorLED(0, 255, 0);
-                        break;
-                    case 2:
-                        // Blue
-                        myGamepad->setColorLED(0, 0, 255);
-                        break;
-                }
-                colorIdx++;
-            }
-
-            if (myGamepad->b()) {
-                // Turn on the 4 LED. Each bit represents one LED.
-                static int led = 0;
-                led++;
-                // Some gamepads like the DS3, DualSense, Nintendo Wii, Nintendo Switch
-                // support changing the "Player LEDs": those 4 LEDs that usually indicate
-                // the "gamepad seat".
-                // It is possible to change them by calling:
-                myGamepad->setPlayerLEDs(led & 0x0f);
-            }
-
-            if (myGamepad->x()) {
-                // Duration: 255 is ~2 seconds
-                // force: intensity
-                // Some gamepads like DS3, DS4, DualSense, Switch, Xbox One S support
-                // rumble.
-                // It is possible to set it by calling:
-                myGamepad->setRumble(0xc0 /* force */, 0xc0 /* duration */);
-            }
 
             // Another way to query the buttons, is by calling buttons(), or
             // miscButtons() which return a bitmask.
             // Some gamepads also have DPAD, axis and more.
+            if (myGamepad->throttle()){D_Motor((myGamepad->throttle())/4);}
+            else if (myGamepad->brake()){D_Motor(-(myGamepad->brake())/4);}
+            else{D_Motor(0);}
+            turn(map(myGamepad->axisRX(),-511,511,45,135));
+            /*
             Serial.printf(
                 "idx=%d, dpad: 0x%02x, buttons: 0x%04x, axis L: %4d, %4d, axis R: %4d, "
                 "%4d, brake: %4d, throttle: %4d, misc: 0x%02x\n",
@@ -363,7 +321,7 @@ while(1){
                 myGamepad->throttle(),    // (0 - 1023): throttle (AKA gas) button
                 myGamepad->miscButtons()  // bitmak of pressed "misc" buttons
             );
-
+            */
             // You can query the axis and other properties as well. See Gamepad.h
             // For all the available functions.
         }
@@ -374,12 +332,8 @@ while(1){
     // If your main loop doesn't have one, just add a simple `vTaskDelay(1)`.
     // Detailed info here:
     // https://stackoverflow.com/questions/66278271/task-watchdog-got-triggered-the-tasks-did-not-reset-the-watchdog-in-time
-
     // vTaskDelay(1);
-    delay(150);
-
-}
-
+    delay(150);}
 }
 
 
@@ -432,6 +386,4 @@ void Set_K_value() {
       break;
       }
   }
-
-  
 }

@@ -14,9 +14,9 @@ M_Encoder GPIO 19, 23
 
 Drive Motor
 
-​	GPIO 35, 33
+​	GPIO 4, 33
 Servo Motor
-​	GPIO 12
+​	GPIO 17
 
 ### Installing Libraries
 
@@ -26,11 +26,10 @@ Open your Arduino IDE and go to **Sketch** > **Include Library** > **Manage Libr
 
 **ESP32Encoder**
 
-**Adafruit Unified Sensor**
+**Bluepad32.h**
 
 **Wire.h**
 
-**ESP32Servo by Kavin Harrington**
 
 **I2Cdev.ht**
 
