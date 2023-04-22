@@ -56,8 +56,8 @@ float MPU_Input;
 float offset=0;
 
 float K1 = 160;
-float K2 = 15.00;
-float K3 = 12.00;
+float K2 = 8.00;
+float K3 = 1.00;
 float K4 = 0.60;
 long currentT, previousT_1, previousT_2 = 0;  
 float loop_time=10;
@@ -141,8 +141,8 @@ void loop() {//CPU Core 1
   if (counter>5){
   Serial.print("AGX: ");
   Serial.print(MPU_Input);Serial.print(",");
-  Serial.print(v_gyrox);Serial.print(",");
   Serial.print(gyroXfilt);Serial.print(",");
+  Serial.print(motor_pos);Serial.print(",");
   Serial.print(motor_speed);Serial.print(",");
   Serial.print(-pwm);//Serial.print(",");
   Serial.println();counter=0;
