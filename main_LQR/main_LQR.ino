@@ -53,12 +53,12 @@ float Py=1, Ry, Ky, Sy, Vy, Qy;             //Kalman variable for y
 float MPU_Input;
 
 /*LQR Const*/
-float offset=0;
+float offset=1;
 
-float K1 = 160;
-float K2 = 8.00;
-float K3 = 1.00;
-float K4 = 0.60;
+float K1 = 110;
+float K2 = 7.00;
+float K3 = 2.00;
+float K4 = -1.80;
 long currentT, previousT_1, previousT_2 = 0;  
 float loop_time=10;
 float gyroXfilt;
@@ -137,7 +137,7 @@ void loop() {//CPU Core 1
   
   //aax, aay, agx, agy, agz
   /* Print out the values */
-  
+
   if (counter>5){
   Serial.print("AGX: ");
   Serial.print(MPU_Input);Serial.print(",");
@@ -303,14 +303,33 @@ void remote(void * parameter){
             // There are different ways to query whether a button is pressed.
             // By query each button individually:
             //  a(), b(), x(), y(), l1(), etc...
+            if (myGamepad->y() && myGamepad->b()) {
+                offset=agx;
+                static int colorIdx = 0;
+                switch (colorIdx % 3) {
+                    case 0:
+                        // Red
+                        myGamepad->setColorLED(255, 0, 0);
+                        break;
+                    case 1:
+                        // Green
+                        myGamepad->setColorLED(0, 255, 0);
+                        break;
+                    case 2:
+                        // Blue
+                        myGamepad->setColorLED(0, 0, 255);
+                        break;
+                }
+                colorIdx++;
+            }
+            if (myGamepad->x()) {
+                myGamepad->setRumble(0xc0 /* force */, 0xc0 /* duration */);
+            }
 
-            // Another way to query the buttons, is by calling buttons(), or
-            // miscButtons() which return a bitmask.
-            // Some gamepads also have DPAD, axis and more.
             if (myGamepad->throttle()){D_Motor((myGamepad->throttle())/4);}
             else if (myGamepad->brake()){D_Motor(-(myGamepad->brake())/4);}
             else{D_Motor(0);}
-            turn(map(myGamepad->axisRX(),-511,511,45,135));
+            turn(map(myGamepad->axisRX(),-511,511,50,130));
             /*
             Serial.printf(
                 "idx=%d, dpad: 0x%02x, buttons: 0x%04x, axis L: %4d, %4d, axis R: %4d, "
