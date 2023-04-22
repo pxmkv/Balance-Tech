@@ -58,7 +58,7 @@ float offset=0;
 float K1 = 110;
 float K2 = 6.00;
 float K3 = 1.50;
-float K4 = -1.80;
+float K4 = 1.80;
 long currentT, previousT_1, previousT_2 = 0;  
 float loop_time=10;
 float gyroXfilt;
@@ -132,7 +132,7 @@ void loop() {//CPU Core 1
   motor_pos += motor_speed;
   motor_pos = constrain(motor_pos, -110, 110);
 
-  int pwm = constrain(K1 * MPU_Input + K2 * gyroXfilt + K3 * motor_speed + K4 * motor_pos, -255, 255); //Linear–quadratic regulator
+  int pwm = constrain(K1 * MPU_Input + K2 * gyroXfilt + K3 * motor_speed - K4 * motor_pos, -255, 255); //Linear–quadratic regulator
   M_Motor(-pwm);
   
   //aax, aay, agx, agy, agz
