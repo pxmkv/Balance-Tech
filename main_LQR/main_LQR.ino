@@ -53,7 +53,7 @@ float Py=1, Ry, Ky, Sy, Vy, Qy;             //Kalman variable for y
 float MPU_Input;
 
 /*LQR Const*/
-float offset=1;
+float offset=0;
 
 float K1 = 110;
 float K2 = 7.00;
@@ -144,7 +144,7 @@ void loop() {//CPU Core 1
   Serial.print(gyroXfilt);Serial.print(",");
   Serial.print(motor_pos);Serial.print(",");
   Serial.print(motor_speed);Serial.print(",");
-  Serial.print(-pwm);//Serial.print(",");
+  Serial.print(-pwm);Serial.print(",");Serial.print(offset);
   Serial.println();counter=0;
   }counter++;
 
