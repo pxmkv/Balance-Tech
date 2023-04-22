@@ -56,7 +56,7 @@ float MPU_Input;
 float offset=0;
 
 float K1 = 110;
-float K2 = 6.00;
+float K2 = 7.00;
 float K3 = 1.50;
 float K4 = -1.80;
 long currentT, previousT_1, previousT_2 = 0;  
