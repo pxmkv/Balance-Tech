@@ -32,7 +32,6 @@ int16_t motor_speed;
 int32_t motor_pos;
 
                              
-
 int16_t ax, ay, az, gx, gy, gz;             //raw data from mpu6050
 float aax=0, aay=0, agx=0, agy=0, agz=0;    //angle var
 long axo = 0, ayo = 0, azo = 0;             //acc offset
