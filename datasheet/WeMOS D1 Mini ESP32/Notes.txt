@@ -1,0 +1,44 @@
+Buy: https://artofcircuits.com/product/wemos-d1-mini-esp32-esp-wroom-32
+
+Description
+
+The WEMOS D1 Mini ESP32 Development Board includes the ESP32 SoC, USB-to-Serial (CP2102) IC, and all the necessary passive components, comes ready for plugging into your computer’s USB port and loading up custom firmware.
+
+The  WEMOS D1 Mini ESP32 board offers an inexpensive solution for making internet-connected and bluetooth-controllable devices. Moreover, its small footprint and accompanying wide range of shields make it an ideal solution for quickly prototyping IoT projects in a compact amount of space.
+
+Even though the WeMos family of boards was originally developed for the ESP8266, the design of this WEMOS D1 Mini ESP32 allows for using the ESP32 with most of the original shields. This represents a great addition to an already superb ecosystem for developing internet-capable applications (Internet Of Things or IoT).
+
+Features
+
+PCB-mounted antenna
+Onboard Micro-USB connector (i.e., USB Micro-B)
+SoC: ESP32 FCC certified Wi-Fi and Bluetooth module (ESP-WROOM-32 Module)
+USB-to-Serial: Silicon Labs CP2102 USB to UART Bridge
+GPIO: 3×UART, 3×SPI, 2×I2S, 18×ADC input channels, 2×DAC output channels, 2×I2C, PWM/timer input/output available on every GPIO pin, OpenOCD debug interface, SDIO master/slave (50 MHz), external SPI flash (up to 16MB), and SD-card interface support
+Size: 39mm × 31mm
+Voltage Reg.: RT9013 500mA LDO
+Power Input: 3.0~5.5VDC
+
+Technical Specifications
+
+Analog-to-Digital Converter (ADC) – Up to 16 channels of 12-bit SAR ADC’s. The ADC range can be set, in firmware, to either 0-1V, 0-1.4V, 0-2V, or 0-4V – no more weird 0-1V ADC!
+Digital-to-Analog Converter (DAC) – Two 8-bit DAC’s to produce true analog voltages
+Pulse-Width Modulation (PWM) – Up to 16 channels of PWM-capable pins for dimming LEDs or controlling motors
+Touch Sensor – 10 GPIOs feature capacitive sensing; make a 10-key buttonpad!
+UART – Two UART interfaces, one is used to load code serially. They feature flow control, and support IrDA too!
+I2C, SPI, I2S – There are two I2C and four SPI interfaces to hook up all sorts of sensors and peripherals, plus two I2S interfaces if you want to add sound to your project.
+Documents and Downloads
+WeMOS D1 Mini ESP32 Schematic
+ESP32 Module Wiki page
+ESP32 Datasheet
+ESP32 Technical Reference manual
+ESP32 RTOS SDK on Github
+A related page on ESP32
+A video tutorial on ESP32 and Arduino IDE
+ESP8266 and ESP32 Differences in One Single Table
+
+Package Includes
+
+1x Wemos D1 Mini ESP32 – ESP-WROOM-32 Development Board (Tested and QC-OK)
+4x 10-Pin Male to Female Standard headers
+2x 8-Pin Male to Female Stackable Headers
