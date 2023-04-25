@@ -43,8 +43,8 @@ The momentum wheel motor is controlled by M_Motor() function
 
 
 
+<img src="https://i1.wp.com/www.esp32learning.com/wp-content/uploads/2018/12/MH-ET_LIVE_D1_mini_ESP32_pinout.png"  width="600" height="400">
 
-![img](https://i1.wp.com/www.esp32learning.com/wp-content/uploads/2018/12/MH-ET_LIVE_D1_mini_ESP32_pinout.png?resize=696%2C479)
 
 
 **Pin Used**
