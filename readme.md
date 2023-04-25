@@ -63,7 +63,8 @@ Drive Motor
 Servo Motor
 ​	GPIO 17
 
-![circuit](/pics/circuit.png) 
+<img src="/pics/circuit.png"  width="300" height="200">
+
 ### Installing Libraries
 
 Open your Arduino IDE and go to **Sketch** > **Include Library** > **Manage Libraries**. The Library Manager should open. Search and install those libraries.
