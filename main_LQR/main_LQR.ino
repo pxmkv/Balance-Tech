@@ -15,8 +15,8 @@ GamepadPtr myGamepads[BP32_MAX_GAMEPADS];
 
 MPU6050 accelgyro;
 ESP32Encoder encoder;
-float v_gyrox;
 long enc_count;
+
 
 const int m_freq = 20000;
 const int resolution = 8;
@@ -49,8 +49,8 @@ float a_x[10]={0}, a_y[10]={0} ,g_x[10]={0} ,g_y[10]={0}; //variance
 float Px=1, Rx, Kx, Sx, Vx, Qx;             //Kalman variable for x
 float Py=1, Ry, Ky, Sy, Vy, Qy;             //Kalman variable for y
 
-float MPU_Input;
-
+float euler_angle;
+float v_gyrox;
 /*LQR Const*/
 float offset=0;
 
@@ -60,7 +60,7 @@ float K3 = 5.00;
 float K4 = 1.80;
 long currentT, previousT_1, previousT_2 = 0;  
 float loop_time=10;
-float gyroXfilt;
+float gyroXfilter;
 
 
 
@@ -123,27 +123,27 @@ void loop() {//CPU Core 1
 
   if (currentT - previousT_1 >= loop_time) {
   Kalman_filter();
-  MPU_Input=-agx+offset;
+  euler_angle=-agx+offset;
   enc_count=encoder.getCount();
   motor_speed=enc_count;
   encoder.setCount(0);
-  gyroXfilt = 0.4 * v_gyrox + (1 - 0.4) * gyroXfilt;
+  gyroXfilter = 0.4 * v_gyrox + (1 - 0.4) * gyroXfilter;
   motor_pos += motor_speed;
-  motor_pos = constrain(motor_pos, -110, 110);
+  motor_pos = constrain(motor_pos, -110, 110); //110 ticks per rev
 
-  int pwm = constrain(K1 * MPU_Input + K2 * gyroXfilt - K3 * motor_speed - K4 * motor_pos, -255, 255); //Linear–quadratic regulator
-  M_Motor(-pwm);
+  int lqr = constrain(K1 * euler_angle + K2 * gyroXfilter - K3 * motor_speed - K4 * motor_pos, -255, 255); //Linear–quadratic regulator
+  M_Motor(-lqr);
   
   //aax, aay, agx, agy, agz
   /* Print out the values */
 
   if (counter>5){
   Serial.print("AGX: ");
-  Serial.print(MPU_Input);Serial.print(",");
-  Serial.print(gyroXfilt);Serial.print(",");
+  Serial.print(euler_angle);Serial.print(",");
+  Serial.print(gyroXfilter);Serial.print(",");
   Serial.print(motor_pos);Serial.print(",");
   Serial.print(motor_speed);Serial.print(",");
-  Serial.print(-pwm);Serial.print(",");Serial.print(offset);
+  Serial.print(-lqr);Serial.print(",");Serial.print(offset);
   Serial.println();counter=0;
   }counter++;
 
@@ -234,7 +234,7 @@ void D_Motor(int spd){
 
 void M_Motor(double spd){
   spd=spd;
-  if (abs(MPU_Input)>22)spd=0;
+  if (abs(euler_angle)>22)spd=0;
   if(spd ==0){digitalWrite(M_SW, LOW);ledcWrite(M_Wheel, 511);}
     else if(spd>0){
       digitalWrite(M_SW, HIGH);
