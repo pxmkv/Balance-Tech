@@ -1,6 +1,7 @@
-The basic goal of this project was to create a two-wheel self balancing object reminiscent of a motorcycle with the ability to move and turnAll three goals were achieved and the balancing expectations were exceeded since it is able to balance on slopes. 
+**Balance Tech**
+**The basic goal of this project was to create a two-wheel self balancing object reminiscent of a motorcycle with the ability to move and turnAll three goals were achieved and the balancing expectations were exceeded since it is able to balance on slopes. **
 
-
+![cad](/pics/cad.png)
 
 **Kalman Filter**
 
@@ -39,7 +40,7 @@ The momentum wheel motor is controlled by M_Motor() function
 
 
 
-![cad](/pics/cad.png)
+
 
 ![img](https://i1.wp.com/www.esp32learning.com/wp-content/uploads/2018/12/MH-ET_LIVE_D1_mini_ESP32_pinout.png?resize=696%2C479)
 
