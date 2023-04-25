@@ -8,7 +8,7 @@ The basic goal of this project was to create a two-wheel self balancing object r
 
 Accurate angle and angular velocity estimation.Precise sensor fusion of accelerometer and gyroscope data from the MPU6050 sensor.
 
-*Basic structure of the code: 
+*Basic structure: 
 
 Data collection from MPU6050 sensor Calculate angles and angular velocities 
 
@@ -29,7 +29,7 @@ Filtered angle and angular velocity data used for LQR controller
 Implementing **Linear–quadratic regulator(LQR)** with adjustable gains for stable balancing under various conditions.
 The LQR controller takes 4 parameters: Euler Angle, Angular velocity, momentum wheel actual speed and momentum wheel position, then calculates the PWM output. 
 
-*Basic structure in our code:
+*Basic structure:
 
 Calls Kalman_filter() function (process data)
 
