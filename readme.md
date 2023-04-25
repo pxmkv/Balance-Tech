@@ -3,7 +3,7 @@
 The basic goal of this project was to create a two-wheel self balancing object reminiscent of a motorcycle with the ability to move and turn
 
 
-![cad](/pics/cad.png)
+![cad](/pics/cad.png) ![bike1](/pics/bike1.png) ![bike2](/pics/bike2.png) 
 
 **Kalman Filter**
 
@@ -63,6 +63,7 @@ Drive Motor
 Servo Motor
 ​	GPIO 17
 
+![circuit](/pics/circuit.png) 
 ### Installing Libraries
 
 Open your Arduino IDE and go to **Sketch** > **Include Library** > **Manage Libraries**. The Library Manager should open. Search and install those libraries.
