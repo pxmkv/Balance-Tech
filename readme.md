@@ -1,5 +1,5 @@
 **Balance Tech**
-**The basic goal of this project was to create a two-wheel self balancing object reminiscent of a motorcycle with the ability to move and turnAll three goals were achieved and the balancing expectations were exceeded since it is able to balance on slopes. **
+The basic goal of this project was to create a two-wheel self balancing object reminiscent of a motorcycle with the ability to move and turnAll three goals were achieved and the balancing expectations were exceeded since it is able to balance on slopes. 
 
 ![cad](/pics/cad.png)
 
