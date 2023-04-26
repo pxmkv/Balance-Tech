@@ -32,17 +32,21 @@ The LQR controller takes 4 parameters: Euler Angle, Angular velocity, momentum w
 
 *Basic structure:
 
-Calls Kalman_filter() function (process data)
+CPU1: 
 
-Calculates the motor speed and position using the encoder data
+  Calls Kalman_filter() function (process data)
 
-Computes the control signal (pwm) based on the LQR control gains (K1-K4)
+  Calculates the motor speed and position using the encoder data
 
-About LQR calculation [/main_LQR/readme.md](https://github.com/pxmkv/Balance-Tech/tree/main/main_LQR)
+  Computes the control signal (pwm) based on the LQR control gains (K1-K4)
 
-The momentum wheel motor is controlled by M_Motor() function
+  About LQR calculation [/main_LQR/readme.md](https://github.com/pxmkv/Balance-Tech/tree/main/main_LQR)
 
+  The momentum wheel motor is controlled by M_Motor() function
 
+CPU0:
+  Read Game Controller input using Bluepad32 library
+  mapping joystick reading value to the drivetrain motor and servo motor
 
 
 <img src="https://i1.wp.com/www.esp32learning.com/wp-content/uploads/2018/12/MH-ET_LIVE_D1_mini_ESP32_pinout.png"  width="600" height="400">
