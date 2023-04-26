@@ -54,8 +54,8 @@ float v_gyrox;
 /*LQR Const*/
 float offset=0;
 
-float K1 = 110;
-float K2 = 6.00;
+float K1 = 108.4496;
+float K2 = 9.6210;
 float K3 = 5.00;
 float K4 = 1.80;
 long currentT, previousT_1, previousT_2 = 0;  
