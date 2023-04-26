@@ -95,7 +95,9 @@ l1 =
 
     0.0600
 
->> k/10 the pwm is not controlled by torque
+
+**the pwm is not controlled by torque, so *0.1 **
+>> k/10 
 
 ans =
 
