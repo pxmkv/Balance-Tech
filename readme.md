@@ -87,6 +87,7 @@ After installing the libraries, restart your Arduino IDE.
 
 something useful:
 
+  https://people.eecs.berkeley.edu/~pabbeel/cs287-fa12/slides/LQR.pdf
   https://authors.library.caltech.edu/5154/1/OLFcdc01b.pdf
   https://www.researchgate.net/publication/351314795_Multibody_Modeling_and_Balance_Control_of_a_Reaction_Wheel_Inverted_Pendulum_Using_LQR_Controller
   
