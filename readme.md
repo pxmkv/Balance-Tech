@@ -32,7 +32,7 @@ The LQR controller takes 4 parameters: Euler Angle, Angular velocity, momentum w
 
 *Basic structure:
 
-CPU1: 
+**CPU1:** 
 
   Calls Kalman_filter() function (process data)
 
@@ -44,7 +44,8 @@ CPU1:
 
   The momentum wheel motor is controlled by M_Motor() function
 
-CPU0:
+**CPU0:**
+
   Read Game Controller input using Bluepad32 library
   mapping joystick reading value to the drivetrain motor and servo motor
 
