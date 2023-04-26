@@ -46,7 +46,7 @@ The LQR controller takes 4 parameters: Euler Angle, Angular velocity, momentum w
 
 **CPU0:**
 
-  Read Game Controller input using Bluepad32 library
+  Read Game Controller input using  [Bluepad32](https://github.com/ricardoquesada/bluepad32/blob/main/docs/plat_arduino.md) library
   mapping joystick reading value to the drivetrain motor and servo motor
 
 
