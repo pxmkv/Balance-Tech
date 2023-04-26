@@ -38,6 +38,8 @@ Calculates the motor speed and position using the encoder data
 
 Computes the control signal (pwm) based on the LQR control gains (K1-K4)
 
+About LQR calculation https://github.com/pxmkv/Balance-Tech/blob/main/main_LQR/readme.md
+
 The momentum wheel motor is controlled by M_Motor() function
 
 
