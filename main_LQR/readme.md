@@ -101,5 +101,5 @@ l1 =
 ans =
 
   -98.4496   -9.6210   -0.0032   -0.1006
-  
-**the pwm is not controlled by torque, so *0.1 **
+ 
+the pwm is not controlled by torque, so *0.1 
