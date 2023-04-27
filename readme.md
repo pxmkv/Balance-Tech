@@ -1,4 +1,4 @@
-<img src="/pics/logo.png"  width="400" height="200">
+<img src="/pics/logo.png">
 
 **Balance-Tech**
 
