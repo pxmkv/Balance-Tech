@@ -30,7 +30,7 @@ Filtered angle and angular velocity data used for LQR controller
 **Dynamic system stability**
 
 Implementing **Linear–quadratic regulator(LQR)** with adjustable gains for stable balancing under various conditions.
-The LQR controller takes 4 parameters: Euler Angle, Angular velocity, momentum wheel actual speed and momentum wheel position, then calculates the PWM output. 
+The LQR controller takes 4 parameters: Euler Angle, Angular velocity, reaction wheel actual speed and reaction wheel position, then calculates the PWM output. 
 
 *Basic structure:
 
@@ -44,7 +44,7 @@ The LQR controller takes 4 parameters: Euler Angle, Angular velocity, momentum w
 
   [About LQR calculation](https://github.com/pxmkv/Balance-Tech/tree/main/main_LQR)
 
-  The momentum wheel motor is controlled by M_Motor() function
+  The reaction wheel motor is controlled by M_Motor() function
 
 **CPU0:**
 
