@@ -77,42 +77,19 @@ Servo Motor
 ​	GPIO 17
 
 
-**Kalman Filter**
-
-Accurate angle and angular velocity estimation.Precise sensor fusion of accelerometer and gyroscope data from the MPU6050 sensor.
-
-*Basic structure: 
-
-Data collection from MPU6050 sensor Calculate angles and angular velocities 
-
-Integrate angular velocities to obtain angles
-
-Calculate average and variance of accelerometer data
-
-Update Kalman gains
-
-Correct angles using Kalman gains and accelerometer data
-
-Update covariance matrices
-
-Filtered angle and angular velocity data used for LQR controller
-
-**Dynamic system stability**
-
-Implementing **Linear–quadratic regulator(LQR)** with adjustable gains for stable balancing under various conditions.
-The LQR controller takes 4 parameters: Euler Angle, Angular velocity, reaction wheel actual speed and reaction wheel position, then calculates the PWM output. 
 
 *Basic structure:
 
 **CPU1:** 
 
-  Calls Kalman_filter() function (process data)
+  **Kalman Filter**
 
-  Calculates the motor speed and position using the encoder data
+  Accurate angle and angular velocity estimation.Precise sensor fusion of accelerometer and gyroscope data from the MPU6050 sensor.
 
-  Computes the control signal (pwm) based on the LQR control gains (K1-K4)
+  **Dynamic system stability**
 
-  The reaction wheel motor is controlled by M_Motor() function
+  Implementing **Linear–quadratic regulator(LQR)** with adjustable gains for stable balancing under various conditions.
+  The LQR controller takes 4 parameters: Euler Angle, Angular velocity, reaction wheel actual speed and reaction wheel position, then calculates the PWM output. 
 
 **CPU0:**
 
