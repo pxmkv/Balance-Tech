@@ -19,6 +19,9 @@ The system’s center of mass is above its pivot point, which makes it inherentl
 
 <img src="/pics/equation1.png"  width="600" height="60">
 
+The following calculations verify the momentum wheel’s ability to apply a neutralizing torque of equal magnitude or higher
+
+<img src="/pics/equation2.png"  width="600" height="500">
 
 **Kalman Filter**
 
