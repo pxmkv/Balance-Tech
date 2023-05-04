@@ -13,7 +13,7 @@ sensors:
 
 <img src="/pics/bike.png">
 
-The bulk of the circuit design lies within a three “story” structure. Three circuit boards with a gap of about an inch between each house all the circuitry and key parts within. Battery power is wired in a position that will decrease center of mass and aid in smoother balancing. The Buck converter allows for an adjustable power supply and the AMS1117 serves as a voltage regulator. Other smaller parts exist in the circuit but the critical parts are provided here
+The bulk of the circuit design lies within a three “story” structure. Three circuit boards with a gap of about an inch between each house all the circuitry and key parts within. Battery power is wired in a position that will decrease center of mass and aid in smoother balancing. The Buck converter allows for an adjustable power supply and the LDO AMS1117 serves as a voltage regulator for the MCU. Other smaller parts exist in the circuit but the critical parts are provided here
 
 <img src="/pics/circuit.png"  width="300" height="200"><img src="/pics/diagram.png"  width="300" height="200">
 
