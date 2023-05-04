@@ -102,8 +102,6 @@ The LQR controller takes 4 parameters: Euler Angle, Angular velocity, reaction w
 
 <img src="https://i1.wp.com/www.esp32learning.com/wp-content/uploads/2018/12/MH-ET_LIVE_D1_mini_ESP32_pinout.png"  width="600" height="400">
 
-
-
 **Pin Used**
 
 M_Encoder GPIO 19, 23
@@ -122,30 +120,42 @@ Servo Motor
 
 
 
-### Installing Libraries
+VI References
+[1] Olfati-Saber, Reza. “Global Stabilization of a Flat Underactuated System: The Inertia Wheel Pendulum.” Conference of Decision and Control, 3 Dec. 2001.
 
-Open your Arduino IDE and go to **Sketch** > **Include Library** > **Manage Libraries**. The Library Manager should open. Search and install those libraries.
-
-**mpu6050**
-
-**ESP32Encoder**
-
-**Bluepad32.h**
-
-**Wire.h**
+authors.library.caltech.edu/5154/1/OLFcdc01b.pdf
 
 
-**I2Cdev.ht**
+[2]Çakan, Abdullah, and Ümit Önen. “Multibody Modeling and Balance Control of AReaction Wheel Inverted Pendulum Using LQRController.” ResearchGate, International Journal of Robotics and Control, 3 Apr. 2021.
 
-After installing the libraries, restart your Arduino IDE.	
+www.researchgate.net/publication/351314795_Multibody_Modeling_and_Balance_Control_of_a_Reaction_Wheel_
+
+Inverted_Pendulum_Using_LQR_Controller. [3]Lacey, Tony . Tutorial: The Kalman Filter.
+
+web.mit.edu/kirtley/kirtley/binlustuff/literature/control/Kalman%20filter.pdf
+
+[4] Hau Nguyen, Binh, and Minh Phuoc Cu. “LQR AND FUZZY CONTROL FOR REACTION WHEEL INVERTED PENDULUM MODEL.” Index Copernicus, 24 1 2019,
+https://journals.indexcopernicus.com/api/file/viewByFileId/746635.pdf.
+
+[5] Leroy, Etienne. “Guide to Gyro and Accelerometer With Arduino Including Kalman Filtering.” Instructables,
+2011, https://www.instructables.com/Guide-to-gyro-and-accelerometer-with-Arduino-inclu/
+
+[6] Polotski, Vladimir. “Kalman filter, how do I choose initial P_0?” ResearchGate, 2017,
+https://www.researchgate.net/post/Kalman_filter_how_do_I_choose_initial_P_0.
 
 
-something useful:
+[7] Vathsangam, Harsh. “Complementary filter - My IMU estimation experience.” Google Sites, 29 May 2010,
+https://sites.google.com/site/myimuestimationexperience/filters/complementary-filter.
 
-  https://people.eecs.berkeley.edu/~pabbeel/cs287-fa12/slides/LQR.pdf
- 
-  https://authors.library.caltech.edu/5154/1/OLFcdc01b.pdf
- 
-  https://www.researchgate.net/publication/351314795_Multibody_Modeling_and_Balance_Control_of_a_Reaction_Wheel_Inverted_Pendulum_Using_LQR_Controller
-  
+[8] Abbeel, Pieter. “Optimal Control for Linear Dynamical Systems and Quadratic Cost.” EECS at UC Berkeley,
+https://people.eecs.berkeley.edu/~pabbeel/cs287-fa12/slides/LQR.pdf.
+
+[9] Sears-Collins, Addison. “Combine the Extended Kalman Filter With LQR – Automatic Addison.” Automatic
+Addison, 13 December 2020, https://automaticaddison.com/combine-the-extended-kalman-filter-with-lqr/.
+
+[10] Quesada, Ricardo. “bluepad32/plat_arduino.md at main · ricardoquesada/bluepad32.” GitHub,
+https://github.com/ricardoquesada/bluepad32/blob/main/docs/plat_arduino.md.
+
+[11] “1-Axis Attitude Control Module with ATOM - M5Stack Projects.” M5Stack Projects, 13 August
+2020, https://m5stack.hackster.io/homemadegarbage/1-axis-attitude-control-module-with-atom-d56138
 
