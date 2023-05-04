@@ -78,7 +78,8 @@ Servo Motor
 
 
 
-*Basic structure:
+
+**Basic structure:**
 
 **CPU1:** 
 
