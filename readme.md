@@ -28,7 +28,7 @@ The following calculations verify the reaction wheel’s ability to apply a neut
 <img src="/pics/equation2.png"  width="600" height="500">
 
 Additionally, the performance curve of the brushless DC motor shows that it is capable of delivering enough torque to the momentum wheel.
-
+<img src="/pics/curve.png"  width="600" height="600">
 
 **Kalman Filter**
 
