@@ -129,7 +129,7 @@ authors.library.caltech.edu/5154/1/OLFcdc01b.pdf
 www.researchgate.net/publication/351314795_Multibody_Modeling_and_Balance_Control_of_a_Reaction_Wheel_Inverted_Pendulum_Using_LQR_Controller. 
 
 [3]Lacey, Tony . Tutorial: The Kalman Filter.
-web.mit.edu/kirtley/kirtley/binlustuff/literature/control/Kalman%20filter.pdf
+http://web.mit.edu/kirtley/kirtley/binlustuff/literature/control/Kalman%20filter.pdf
 
 [4] Hau Nguyen, Binh, and Minh Phuoc Cu. “LQR AND FUZZY CONTROL FOR REACTION WHEEL INVERTED PENDULUM MODEL.” Index Copernicus, 24 1 2019,
 https://journals.indexcopernicus.com/api/file/viewByFileId/746635.pdf.
