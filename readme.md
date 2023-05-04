@@ -20,7 +20,7 @@ The bulk of the circuit design lies within a three “story” structure. Three 
 ** Engineering Analysis **
 A. External Torque Requirements
 
-<img src="/pics/diagram2.png"  width="600" height="660">
+<img src="/pics/diagram2.png" >
 
 The system’s center of mass is above its pivot point, which makes it inherently unstable; any tilt will result in a gravitational torque. The Euler angle quantifies the angular displacement of the system about the axis of rotation. If the Euler angle reaches a threshold of 22°, the motor is programmed to stop. Taking that as the maximum angle of operation, the maximum gravitational torque is as follows:
 
