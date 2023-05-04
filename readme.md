@@ -10,6 +10,7 @@ The basic goal of this project was to create a two-wheel self balancing object r
 
 Integrated device with labeled actuators and
 sensors:
+
 <img src="/pics/bike.png"  width="600" height="400">
 
 The bulk of the circuit design lies within a three “story” structure. Three circuit boards with a gap of about an inch between each house all the circuitry and key parts within. Battery power is wired in a position that will decrease center of mass and aid in smoother balancing. The Buck converter allows for an adjustable power supply and the AMS1117 serves as a voltage regulator. Other smaller parts exist in the circuit but the critical parts are provided here
