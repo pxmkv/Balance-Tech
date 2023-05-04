@@ -6,7 +6,8 @@ The basic goal of this project was to create a two-wheel self balancing object r
 
 <img src="/pics/cad.png"  width="300" height="200"><img src="/pics/bike1.png"  width="300" height="200"><img src="/pics/bike2.png"  width="300" height="200"><img src="/pics/bike3.png"  width="300" height="200">
 
-
+Integrated device with labeled actuators and
+sensors:
 <img src="/pics/bike.png"  width="600" height="400">
 
 
@@ -75,9 +76,11 @@ Drive Motor
 Servo Motor
 ​	GPIO 17
 
-<img src="/pics/circuit.png"  width="300" height="200">
+<img src="/pics/circuit.png"  width="300" height="200"><img src="/pics/diagram.png"  width="300" height="200">
 
 The bulk of the circuit design lies within a three “story” structure. Three circuit boards with a gap of about an inch between each house all the circuitry and key parts within. Battery power is wired in a position that will decrease center of mass and aid in smoother balancing. The Buck converter allows for an adjustable power supply and the AMS1117 serves as a voltage regulator. Other smaller parts exist in our circuit but the critical parts are provided here
+
+
 
 ### Installing Libraries
 
