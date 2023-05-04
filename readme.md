@@ -120,7 +120,8 @@ Servo Motor
 
 
 **Something useful**
-VI References
+
+References
 
 [1] Olfati-Saber, Reza. “Global Stabilization of a Flat Underactuated System: The Inertia Wheel Pendulum.” Conference of Decision and Control, 3 Dec. 2001.
 authors.library.caltech.edu/5154/1/OLFcdc01b.pdf
