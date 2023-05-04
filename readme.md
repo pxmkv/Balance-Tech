@@ -28,11 +28,11 @@ The system’s center of mass is above its pivot point, which makes it inherentl
 
 The following calculations verify the reaction wheel’s ability to apply a neutralizing torque of equal magnitude or higher
 
-<img src="/pics/equation2.png"  width="600" height="500">
+<img src="/pics/equation2.png"  >
 
 Additionally, the performance curve of the brushless DC motor shows that it is capable of delivering enough torque to the reaction wheel.
 
-<img src="/pics/curve.png"  width="600" height="600">
+<img src="/pics/curve.png"  
 
 B. Optimization of the K Gain Matrix
 
@@ -41,17 +41,17 @@ applied by the momentum wheel; the desired states of these parameters depend on 
 The K gain matrix is the set of feedback gains that are used to adjust the speed and direction of the momentum wheel based on the difference between the desired and actual states of the system. The LQR algorithm is used to find the optimal K gain matrix that minimizes the control effort (i.e. motor speed/torque) while also minimizing the system’s deviation from the desired state. The calculation of the optimal K gain matrix was done using the lqr() function in MATLAB. This function requires four inputs: two linearized state-space matrices A and B, the state-cost weighted matrix Q, and the control weighted matrix R. 
 The K feedback gain is multiplied by the difference between the actual state and desired state to generate the control signal (u) that will minimize the quadratic cost function J(u) [3], which is constricted to linear system dynamics [13]. The optimal K gain matrix is found using the lqr() function in MATLAB [11], which uses matrices A,B,Q, and R to find P via the Ricatti equation [6] and solve for K [5].
 
-<img src="/pics/equation3.png"  width="600" height="450">
+<img src="/pics/equation3.png" >
 
 Matrices A and B are found by modeling the system’s motion using the Lagrange equations [7][8], then linearizing the results into the state space equations [9].
 
-<img src="/pics/equation4.png"  width="600" height="150">
+<img src="/pics/equation4.png"  >
 
-<img src="/pics/equation5.png"  width="600" height="900">
+<img src="/pics/equation5.png"  >
 
 The values in the state-cost weighted matrix Q determine the level of emphasis placed on minimizing the state’s deviations in the cost function. The Q matrix for this system places equal weight to the Euler angle, angular velocity, and motor speed state, and a much smaller weight (0.001) to the motor position. This means that it is much less important for the motor position to match the desired state than it is for the Euler angle, angular velocity, and motor speed state. The control weighted matrix R equals one, which means that minimizing the state’s deviations is equally as important as minimizing the control effort.
 
-<img src="/pics/equation6.png"  width="600" height="330">
+<img src="/pics/equation6.png"  >
 
 Plugging the four matrices into the lqr() function [4], the theoretical K matrix was determined. By conducted a series of experiments to fine-tune the K values until get the final K matrix [11] provided stable performance. This process allowed us to identify a more effective set of feedback gains that ultimately improved the system's stability and control accuracy. [About LQR calculation using MATLAB](https://github.com/pxmkv/Balance-Tech/tree/main/main_LQR)
 
