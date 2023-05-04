@@ -119,19 +119,16 @@ Servo Motor
 ​	GPIO 17
 
 
-
+**Something useful**
 VI References
-[1] Olfati-Saber, Reza. “Global Stabilization of a Flat Underactuated System: The Inertia Wheel Pendulum.” Conference of Decision and Control, 3 Dec. 2001.
 
+[1] Olfati-Saber, Reza. “Global Stabilization of a Flat Underactuated System: The Inertia Wheel Pendulum.” Conference of Decision and Control, 3 Dec. 2001.
 authors.library.caltech.edu/5154/1/OLFcdc01b.pdf
 
-
 [2]Çakan, Abdullah, and Ümit Önen. “Multibody Modeling and Balance Control of AReaction Wheel Inverted Pendulum Using LQRController.” ResearchGate, International Journal of Robotics and Control, 3 Apr. 2021.
-
 www.researchgate.net/publication/351314795_Multibody_Modeling_and_Balance_Control_of_a_Reaction_Wheel_
 
 Inverted_Pendulum_Using_LQR_Controller. [3]Lacey, Tony . Tutorial: The Kalman Filter.
-
 web.mit.edu/kirtley/kirtley/binlustuff/literature/control/Kalman%20filter.pdf
 
 [4] Hau Nguyen, Binh, and Minh Phuoc Cu. “LQR AND FUZZY CONTROL FOR REACTION WHEEL INVERTED PENDULUM MODEL.” Index Copernicus, 24 1 2019,
