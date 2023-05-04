@@ -11,6 +11,12 @@ sensors:
 <img src="/pics/bike.png"  width="600" height="400">
 
 
+The bulk of the circuit design lies within a three “story” structure. Three circuit boards with a gap of about an inch between each house all the circuitry and key parts within. Battery power is wired in a position that will decrease center of mass and aid in smoother balancing. The Buck converter allows for an adjustable power supply and the AMS1117 serves as a voltage regulator. Other smaller parts exist in our circuit but the critical parts are provided here
+
+<img src="/pics/circuit.png"  width="300" height="200"><img src="/pics/diagram.png"  width="300" height="200">
+
+
+
 **Kalman Filter**
 
 Accurate angle and angular velocity estimation.Precise sensor fusion of accelerometer and gyroscope data from the MPU6050 sensor.
@@ -75,10 +81,6 @@ Drive Motor
 ​	GPIO 4, 33
 Servo Motor
 ​	GPIO 17
-
-<img src="/pics/circuit.png"  width="300" height="200"><img src="/pics/diagram.png"  width="300" height="200">
-
-The bulk of the circuit design lies within a three “story” structure. Three circuit boards with a gap of about an inch between each house all the circuitry and key parts within. Battery power is wired in a position that will decrease center of mass and aid in smoother balancing. The Buck converter allows for an adjustable power supply and the AMS1117 serves as a voltage regulator. Other smaller parts exist in our circuit but the critical parts are provided here
 
 
 
