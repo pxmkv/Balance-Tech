@@ -57,6 +57,26 @@ Plugging the four matrices into the lqr() function [4], the theoretical K matrix
 
 <img src="/pics/equation7.png"  width="600" height="60">
 
+
+<img src="https://i1.wp.com/www.esp32learning.com/wp-content/uploads/2018/12/MH-ET_LIVE_D1_mini_ESP32_pinout.png"  width="600" height="400">
+
+**Pin Used**
+
+M_Encoder GPIO 19, 23
+
+​	PWM : GPIO 26
+
+​	PWS  : GPIO 18
+
+​	DIR    : GPIO 5
+
+Drive Motor
+
+​	GPIO 4, 33
+Servo Motor
+​	GPIO 17
+
+
 **Kalman Filter**
 
 Accurate angle and angular velocity estimation.Precise sensor fusion of accelerometer and gyroscope data from the MPU6050 sensor.
@@ -98,25 +118,6 @@ The LQR controller takes 4 parameters: Euler Angle, Angular velocity, reaction w
 
   Read Game Controller input using  [Bluepad32](https://github.com/ricardoquesada/bluepad32/blob/main/docs/plat_arduino.md) library
   and mapping joystick reading value to the drivetrain motor and servo motor
-
-
-<img src="https://i1.wp.com/www.esp32learning.com/wp-content/uploads/2018/12/MH-ET_LIVE_D1_mini_ESP32_pinout.png"  width="600" height="400">
-
-**Pin Used**
-
-M_Encoder GPIO 19, 23
-
-​	PWM : GPIO 26
-
-​	PWS  : GPIO 18
-
-​	DIR    : GPIO 5
-
-Drive Motor
-
-​	GPIO 4, 33
-Servo Motor
-​	GPIO 17
 
 
 **Something useful**
