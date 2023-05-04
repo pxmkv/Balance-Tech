@@ -11,10 +11,12 @@ sensors:
 <img src="/pics/bike.png"  width="600" height="400">
 
 
-The bulk of the circuit design lies within a three “story” structure. Three circuit boards with a gap of about an inch between each house all the circuitry and key parts within. Battery power is wired in a position that will decrease center of mass and aid in smoother balancing. The Buck converter allows for an adjustable power supply and the AMS1117 serves as a voltage regulator. Other smaller parts exist in our circuit but the critical parts are provided here
+The bulk of the circuit design lies within a three “story” structure. Three circuit boards with a gap of about an inch between each house all the circuitry and key parts within. Battery power is wired in a position that will decrease center of mass and aid in smoother balancing. The Buck converter allows for an adjustable power supply and the AMS1117 serves as a voltage regulator. Other smaller parts exist in the circuit but the critical parts are provided here
 
 <img src="/pics/circuit.png"  width="300" height="200"><img src="/pics/diagram.png"  width="300" height="200">
 
+The system’s center of mass is above its pivot point, which makes it inherently unstable; any tilt will result in a gravitational torque. The Euler angle quantifies the angular displacement of the system about the axis of rotation. If the Euler angle reaches a threshold of 22°, the motor is programmed to stop. Taking that as the maximum angle of operation, the maximum gravitational torque is as follows:
+<img src="/pics/equation1.png"  width="150" height="15"
 
 
 **Kalman Filter**
