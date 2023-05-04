@@ -52,7 +52,7 @@ The values in the state-cost weighted matrix Q determine the level of emphasis p
 
 Plugging the four matrices into the lqr() function [4], the theoretical K matrix was determined. We conducted a series of experiments to fine-tune the K values until the final K matrix [11] provided stable performance. This process allowed us to identify a more effective set of feedback gains that ultimately improved the system's stability and control accuracy. [About LQR calculation using MATLAB](https://github.com/pxmkv/Balance-Tech/tree/main/main_LQR)
 
-<img src="/pics/equation7.png"  width="600" height="150">
+<img src="/pics/equation7.png"  width="600" height="60">
 
 **Kalman Filter**
 
