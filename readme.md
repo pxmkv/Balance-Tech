@@ -11,7 +11,7 @@ The basic goal of this project was to create a two-wheel self balancing object r
 Integrated device with labeled actuators and
 sensors:
 
-<img src="/pics/bike.png"  width="600" height="400">
+<img src="/pics/bike.png">
 
 The bulk of the circuit design lies within a three “story” structure. Three circuit boards with a gap of about an inch between each house all the circuitry and key parts within. Battery power is wired in a position that will decrease center of mass and aid in smoother balancing. The Buck converter allows for an adjustable power supply and the AMS1117 serves as a voltage regulator. Other smaller parts exist in the circuit but the critical parts are provided here
 
@@ -55,7 +55,7 @@ The values in the state-cost weighted matrix Q determine the level of emphasis p
 
 Plugging the four matrices into the lqr() function [4], the theoretical K matrix was determined. By conducted a series of experiments to fine-tune the K values until get the final K matrix [11] provided stable performance. This process allowed us to identify a more effective set of feedback gains that ultimately improved the system's stability and control accuracy. [About LQR calculation using MATLAB](https://github.com/pxmkv/Balance-Tech/tree/main/main_LQR)
 
-<img src="/pics/equation7.png"  width="600" height="60">
+<img src="/pics/equation7.png" >
 
 
 <img src="https://i1.wp.com/www.esp32learning.com/wp-content/uploads/2018/12/MH-ET_LIVE_D1_mini_ESP32_pinout.png"  width="600" height="400">
