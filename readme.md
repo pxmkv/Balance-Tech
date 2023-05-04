@@ -74,6 +74,8 @@ Servo Motor
 
 <img src="/pics/circuit.png"  width="300" height="200">
 
+The bulk of the circuit design lies within a three “story”structure. Three PCBs with a gap of about an inch between each house all the circuitry and key parts within. Battery power is wired in a position that will decrease center of mass and aid in smoother balancing. The Buck converter allows for an adjustable power supply and the AMS1117 serves as a voltage regulator. Other smaller parts exist in our circuit but the critical parts are provided here
+
 ### Installing Libraries
 
 Open your Arduino IDE and go to **Sketch** > **Include Library** > **Manage Libraries**. The Library Manager should open. Search and install those libraries.
