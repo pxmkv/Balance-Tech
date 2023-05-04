@@ -76,8 +76,8 @@ Drive Motor
 Servo Motor
 ​	GPIO 17
 
-
-
+ 
+ 
 
 **Basic structure:**
 
@@ -97,7 +97,8 @@ Servo Motor
   Read Game Controller input using  [Bluepad32](https://github.com/ricardoquesada/bluepad32/blob/main/docs/plat_arduino.md) library
   and mapping joystick reading value to the drivetrain motor and servo motor
 
-
+ 
+  
 **Something useful**
 
 References
