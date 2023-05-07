@@ -31,7 +31,7 @@ The following calculations verify the reaction wheel’s ability to apply a neut
 
 Additionally, the performance curve of the brushless DC motor shows that it is capable of delivering enough torque to the reaction wheel.
 
-<img src="/pics/curve.png"  
+<img src="/pics/curve.png"  >
 
 B. Optimization of the K Gain Matrix
 
