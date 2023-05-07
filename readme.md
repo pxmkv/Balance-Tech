@@ -1,6 +1,5 @@
 <img src="/pics/logo.png">
 
-#Balance-Tech
 
 The basic goal of this project was to create a two-wheel self balancing object reminiscent of a motorcycle with the ability to move and turn
 
