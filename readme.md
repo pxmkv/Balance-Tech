@@ -1,138 +1,405 @@
-<img src="/pics/logo.png">
+# Balance-Tech — Reaction-Wheel Self-Balancing Bike (ESP32 + LQR)
 
+![Balance-Tech](pics/logo.png)
 
-The basic goal of this project was to create a two-wheel self balancing object reminiscent of a motorcycle with the ability to move and turn
+A two-wheel self-balancing object reminiscent of a motorcycle, with the ability to **move** and **turn**.  
+Balancing is achieved using a **reaction (momentum) wheel** driven by a motor, with a **Kalman filter** for tilt estimation and **LQR state feedback** for control.
 
-<img src="/pics/cad.png"  width="300" height="200"><img src="/pics/bike1.png"  width="300" height="200">
+> **Safety:** the firmware stops the momentum wheel motor when the tilt exceeds **22°**.
 
-<img src="/pics/bike2.png"  width="300" height="200"><img src="/pics/bike3.png"  width="300" height="200">
+---
 
-Integrated device with labeled actuators and
-sensors:
+## Demo / Photos
 
-<img src="/pics/bike.png">
+<img src="pics/cad.png" width="48%"><img src="pics/bike1.png" width="48%">
 
-The bulk of the circuit design lies within a three “story” structure. Three circuit boards with a gap of about an inch between each house all the circuitry and key parts within. Battery power is wired in a position that will decrease center of mass and aid in smoother balancing. The Buck converter allows for an adjustable power supply and the LDO AMS1117 serves as a voltage regulator for the MCU. Other smaller parts exist in the circuit but the critical parts are provided here
+<img src="pics/bike2.png" width="48%"><img src="pics/bike3.png" width="48%">
 
-<img src="/pics/circuit.png"  width="300" height="200"><img src="/pics/diagram.png"  width="300" height="200">
+**Integrated device with labeled actuators and sensors:**
 
-** Engineering Analysis **
-A. External Torque Requirements
+<img src="pics/bike.png" width="90%">
 
-<img src="/pics/diagram2.png" >
+---
 
-The system’s center of mass is above its pivot point, which makes it inherently unstable; any tilt will result in a gravitational torque. The Euler angle quantifies the angular displacement of the system about the axis of rotation. If the Euler angle reaches a threshold of 22°, the motor is programmed to stop. Taking that as the maximum angle of operation, the maximum gravitational torque is as follows:
+## System overview
 
-<img src="/pics/equation1.png" >
+<img src="pics/diagram.png" width="85%">
 
-The following calculations verify the reaction wheel’s ability to apply a neutralizing torque of equal magnitude or higher
+**Mechanical/coordinate model used in the derivation:**
 
-<img src="/pics/equation2.png"  >
+<img src="pics/diagram2.png" width="55%">
 
-Additionally, the performance curve of the brushless DC motor shows that it is capable of delivering enough torque to the reaction wheel.
+**Electronics stack (as built):**
 
-<img src="/pics/curve.png"  >
+<img src="pics/circuit.png" width="85%">
 
-B. Optimization of the K Gain Matrix
+The bulk of the circuit design lies within a three “story” structure: three circuit boards with ~1 inch spacing.  
+Battery power is wired low to reduce center of mass. A buck converter provides adjustable supply and an AMS1117 (DS1117) provides regulation for the MCU.
 
-There are four parameters that provide information about the system's state and help to determine the appropriate control actions to maintain balance: the Euler angle, the angular velocity of the system, the motor speed, and the motor position. The Euler angle and angular velocity describe the effect of the gravitational torque; the desired states are 0° and 0 rad/s respectively. The motor speed and motor position describe the effect of the torque
-applied by the momentum wheel; the desired states of these parameters depend on the system’s dynamics. In order to maintain balance of the system, a feedback control approach is used to bring the actual states closer to the desired states. 
-The K gain matrix is the set of feedback gains that are used to adjust the speed and direction of the momentum wheel based on the difference between the desired and actual states of the system. The LQR algorithm is used to find the optimal K gain matrix that minimizes the control effort (i.e. motor speed/torque) while also minimizing the system’s deviation from the desired state. The calculation of the optimal K gain matrix was done using the lqr() function in MATLAB. This function requires four inputs: two linearized state-space matrices A and B, the state-cost weighted matrix Q, and the control weighted matrix R. 
-The K feedback gain is multiplied by the difference between the actual state and desired state to generate the control signal (u) that will minimize the quadratic cost function J(u) [3], which is constricted to linear system dynamics [13]. The optimal K gain matrix is found using the lqr() function in MATLAB [11], which uses matrices A,B,Q, and R to find P via the Ricatti equation [6] and solve for K [5].
+---
 
-<img src="/pics/equation3.png" >
+## Repository layout
 
-Matrices A and B are found by modeling the system’s motion using the Lagrange equations [7][8], then linearizing the results into the state space equations [9].
+- `readme.md` — this document  
+- `main_LQR/` — Arduino firmware (`main_LQR.ino`) + MATLAB/LQR notes (`main_LQR/readme.md`)
+- `schematic/` — wiring reference (PDF)
+- `pics/` — images used by the README
+- `CAD Files/` — SolidWorks files
+- `STL Files/` — printable STLs
+- `datasheet/` — key component datasheets
+- `LICENSE` — BSD-2-Clause
 
-<img src="/pics/equation4.png"  >
+---
 
-<img src="/pics/equation5.png"  >
+## Hardware
 
-The values in the state-cost weighted matrix Q determine the level of emphasis placed on minimizing the state’s deviations in the cost function. The Q matrix for this system places equal weight to the Euler angle, angular velocity, and motor speed state, and a much smaller weight (0.001) to the motor position. This means that it is much less important for the motor position to match the desired state than it is for the Euler angle, angular velocity, and motor speed state. The control weighted matrix R equals one, which means that minimizing the state’s deviations is equally as important as minimizing the control effort.
+### Actuators
+- **Momentum wheel motor**: generates stabilizing torque by accelerating/decelerating the wheel.
+- **Rear drive motor**: propels the bike forward/backward.
+- **Steering servo**: turns the front wheel.
 
-<img src="/pics/equation6.png"  >
+### Sensors
+- **IMU**: MPU6050 (code) / MPU-6000 class (see datasheet)
+- **Quadrature encoder** on the momentum wheel motor (speed + position)
 
-Plugging the four matrices into the lqr() function [4], the theoretical K matrix was determined. By conducted a series of experiments to fine-tune the K values until get the final K matrix [11] provided stable performance. This process allowed us to identify a more effective set of feedback gains that ultimately improved the system's stability and control accuracy. [About LQR calculation using MATLAB](https://github.com/pxmkv/Balance-Tech/tree/main/main_LQR)
+### Controller
+- **MCU**: WeMOS D1 mini ESP32 (ESP-WROOM-32)
 
-<img src="/pics/equation7.png" >
+Board reference:
 
+<img src="datasheet/WeMOS%20D1%20Mini%20ESP32/WEMOS-D1-MINI-ESP32-1.jpg" width="70%">
 
-<img src="https://i1.wp.com/www.esp32learning.com/wp-content/uploads/2018/12/MH-ET_LIVE_D1_mini_ESP32_pinout.png"  width="600" height="400">
+---
 
-**Pin Used**
+## Wiring / Pin map (firmware defaults)
 
-M_Encoder GPIO 19, 23
+| Function | GPIO | Notes |
+|---|---:|---|
+| Momentum wheel PWM | 26 | 20 kHz PWM (`ledc`) |
+| Momentum wheel enable/switch | 18 | `M_SW` |
+| Momentum wheel direction | 5 | `M_Dir` |
+| Encoder A / B | 19 / 23 | `ESP32Encoder.attachHalfQuad(19, 23)` |
+| Drive motor PWM (H-bridge) | 33 / 4 | 5 kHz (`D1=33`, `D2=4`) |
+| Steering servo PWM | 17 | 50 Hz (`servoChannel`) |
+| IMU I²C | SDA=21, SCL=22 | `Wire.begin()` defaults |
 
-​	PWM : GPIO 26
+Full wiring PDF: [`schematic/sch(just for reference).pdf`](schematic/sch(just%20for%20reference).pdf)
 
-​	PWS  : GPIO 18
+---
 
-​	DIR    : GPIO 5
+## Firmware: build & run
 
-Drive Motor
+### Toolchain
+- Arduino IDE or PlatformIO (Arduino framework)
+- Board: “ESP32 Dev Module” (or compatible)
 
-​	GPIO 4, 33
-Servo Motor
-​	GPIO 17
+### Libraries
+- `ESP32Encoder`
+- `I2Cdev` + `MPU6050`
+- `Bluepad32`
 
- 
- 
+### Runtime steps
+1. Power on the bike.
+2. Connect a Bluetooth gamepad (Bluepad32).
+3. Calibrate upright offset:
+   - **Gamepad:** press **Y + B** (sets `offset = agx`)
+   - **Serial:** send `c` (also sets `offset = agx`)
+4. Balancing loop runs at ~100 Hz (`loop_time = 10 ms`).
 
-**Basic structure:**
+---
 
-**CPU1:** 
+## CPU / task structure (ESP32 dual-core)
 
-  **Kalman Filter**
+The firmware pins the remote/gamepad task to core 0, while the balancing loop runs on core 1:
 
-  Accurate angle and angular velocity estimation.Precise sensor fusion of accelerometer and gyroscope data from the MPU6050 sensor.
+- **CPU Core 1 (`loop`)**
+  - Kalman filter (MPU6050 accel + gyro fusion)
+  - State computation and LQR control
+- **CPU Core 0 (`remote` task)**
+  - Read game controller input via Bluepad32
+  - Map throttle/brake to drive motor
+  - Map joystick to steering servo
+  - Provide quick offset calibration via Y+B
 
-  **Dynamic system stability**
+---
 
-  Implementing **Linear–quadratic regulator(LQR)** with adjustable gains for stable balancing under various conditions.
-  The LQR controller takes 4 parameters: Euler Angle, Angular velocity, reaction wheel actual speed and reaction wheel position, then calculates the PWM output. 
+## Live tuning (Serial)
 
-**CPU0:**
+Send newline-terminated commands:
 
-  Read Game Controller input using  [Bluepad32](https://github.com/ricardoquesada/bluepad32/blob/main/docs/plat_arduino.md) library
-  and mapping joystick reading value to the drivetrain motor and servo motor
+- `a<value>` → set `K1`
+- `s<value>` → set `K2`
+- `d<value>` → set `K3`
+- `f<value>` → set `K4`
+- `o<value>` → set `offset`
+- `c` → calibrate (`offset = agx`)
 
- 
-  
-**Something useful**
+Example:
 
-References
+```txt
+a120
+s10
+d5
+f2
+```
 
-[1] Olfati-Saber, Reza. “Global Stabilization of a Flat Underactuated System: The Inertia Wheel Pendulum.” Conference of Decision and Control, 3 Dec. 2001.
-authors.library.caltech.edu/5154/1/OLFcdc01b.pdf
+---
 
-[2]Çakan, Abdullah, and Ümit Önen. “Multibody Modeling and Balance Control of AReaction Wheel Inverted Pendulum Using LQRController.” ResearchGate, International Journal of Robotics and Control, 3 Apr. 2021.
-www.researchgate.net/publication/351314795_Multibody_Modeling_and_Balance_Control_of_a_Reaction_Wheel_Inverted_Pendulum_Using_LQR_Controller. 
+## Control architecture
 
-[3]Lacey, Tony . Tutorial: The Kalman Filter.
-http://web.mit.edu/kirtley/kirtley/binlustuff/literature/control/Kalman%20filter.pdf
+### State estimation
+The IMU provides raw accel/gyro. The code:
+- Computes accel tilt (deg) using `atan()`
+- Integrates gyro to emphasize short-term dynamics
+- Applies a simple Kalman update to fuse accel + gyro (`Kalman_filter()`)
 
-[4] Hau Nguyen, Binh, and Minh Phuoc Cu. “LQR AND FUZZY CONTROL FOR REACTION WHEEL INVERTED PENDULUM MODEL.” Index Copernicus, 24 1 2019,
-https://journals.indexcopernicus.com/api/file/viewByFileId/746635.pdf.
+Balancing loop states used in control:
+- `euler_angle` (deg): computed as `-agx + offset`
+- `gyroXfilter` (deg/s): low-pass filtered angular rate
+- `motor_speed` (encoder ticks per loop): `enc_count` each loop
+- `motor_pos` (encoder tick accumulator): clamped to `[-110, 110]`
 
-[5] Leroy, Etienne. “Guide to Gyro and Accelerometer With Arduino Including Kalman Filtering.” Instructables,
-2011, https://www.instructables.com/Guide-to-gyro-and-accelerometer-with-Arduino-inclu/
+> **Important:** the implementation mixes units (**degrees**, **deg/s**, and **encoder ticks**).  
+> The resulting “LQR gains” in firmware should be treated as **tuned state-feedback gains** for these units.
 
-[6] Polotski, Vladimir. “Kalman filter, how do I choose initial P_0?” ResearchGate, 2017,
-https://www.researchgate.net/post/Kalman_filter_how_do_I_choose_initial_P_0.
+### State feedback (as implemented)
+The controller in `main_LQR.ino` computes:
 
+```txt
+u = K1*euler_angle + K2*gyroXfilter - K3*motor_speed - K4*motor_pos
+PWM = clamp(u, -255, 255)
+```
 
-[7] Vathsangam, Harsh. “Complementary filter - My IMU estimation experience.” Google Sites, 29 May 2010,
-https://sites.google.com/site/myimuestimationexperience/filters/complementary-filter.
+And applies `PWM` to the momentum wheel motor. If `|euler_angle| > 22°`, the momentum wheel motor output is forced to zero.
 
-[8] Abbeel, Pieter. “Optimal Control for Linear Dynamical Systems and Quadratic Cost.” EECS at UC Berkeley,
-https://people.eecs.berkeley.edu/~pabbeel/cs287-fa12/slides/LQR.pdf.
+---
 
-[9] Sears-Collins, Addison. “Combine the Extended Kalman Filter With LQR – Automatic Addison.” Automatic
-Addison, 13 December 2020, https://automaticaddison.com/combine-the-extended-kalman-filter-with-lqr/.
+## Engineering analysis (all equations converted to LaTeX)
 
-[10] Quesada, Ricardo. “bluepad32/plat_arduino.md at main · ricardoquesada/bluepad32.” GitHub,
-https://github.com/ricardoquesada/bluepad32/blob/main/docs/plat_arduino.md.
+### A) External torque requirement (gravity vs. reaction wheel)
 
-[11] “1-Axis Attitude Control Module with ATOM - M5Stack Projects.” M5Stack Projects, 13 August
-2020, https://m5stack.hackster.io/homemadegarbage/1-axis-attitude-control-module-with-atom-d56138
+The system’s center of mass is above its pivot point, making it inherently unstable.  
+If the Euler angle reaches a threshold of 22°, the motor is programmed to stop. Taking that as the maximum operating angle, the maximum gravitational torque is:
 
+$$
+T_g = H_1\,M\,g\,\sin(22^\circ) = 0.134~\mathrm{N\cdot m}
+$$
+
+The following calculations verify the reaction wheel’s ability to apply a neutralizing torque of equal magnitude or higher.
+
+Motor rotor inertia (solid disk approximation):
+
+$$
+I_{\mathrm{motor}} = \frac{1}{2}MR^2 = 2.942\times 10^{-5}~\mathrm{kg\cdot m^2}
+$$
+
+Rated motor torque:
+
+$$
+T_{\mathrm{motor,rated}} = 0.0385~\mathrm{N\cdot m}
+$$
+
+Max angular acceleration:
+
+$$
+\alpha_{\max} = \frac{T_{\mathrm{motor,rated}}}{I_{\mathrm{motor}}}
+= 1308~\mathrm{rad/s^2}
+$$
+
+Reaction wheel inertia (thick ring approximation):
+
+$$
+I_w = \frac{1}{2}M\left(R_1^2 + R_2^2\right) = 2.699\times 10^{-4}~\mathrm{kg\cdot m^2}
+$$
+
+Max reaction wheel torque:
+
+$$
+T_{w,\max} = I_w\,\alpha_{\max} = 0.343~\mathrm{N\cdot m}
+$$
+
+Additionally, the performance curve of the BLDC motor shows it is capable of delivering sufficient torque:
+
+<img src="pics/curve.png" width="85%">
+
+---
+
+### B) Optimization of the K gain matrix (LQR)
+
+There are four parameters that describe the system state:
+1) Euler angle  
+2) angular velocity  
+3) reaction wheel speed  
+4) reaction wheel position  
+
+A feedback approach is used to bring actual states toward desired states. The gain matrix is computed by LQR to minimize both state error and control effort.
+
+Control law:
+
+$$
+u = -K\left(x-x_{\mathrm{desired}}\right)
+$$
+
+Quadratic cost function:
+
+$$
+J(u)=\int_{0}^{\infty}\left(x^TQx+u^TRu+2x^TNu\right)\,dt
+$$
+
+In MATLAB:
+
+$$
+K = \mathrm{lqr}(A,B,Q,R)
+$$
+
+And for the continuous-time algebraic Riccati equation (CARE):
+
+$$
+K = R^{-1}\left(B^TP\right)
+$$
+
+$$
+A^TP + PA - (PB)R^{-1}(B^TP) + Q = 0
+$$
+
+---
+
+### C) Lagrange modeling (reaction-wheel inverted pendulum)
+
+Following the project derivation, the Lagrangian is formed from kinetic and potential energy terms:
+
+$$
+L = K_1 + K_2 - V
+$$
+
+where $K_1$ and $K_2$ are kinetic energy terms and $V$ is the potential energy.
+
+Euler–Lagrange equations:
+
+$$
+\frac{d}{dt}\left(\frac{\partial L}{\partial \dot{\theta}}\right)-\frac{\partial L}{\partial \theta}=T_g,\qquad
+\frac{d}{dt}\left(\frac{\partial L}{\partial \dot{\phi}}\right)-\frac{\partial L}{\partial \phi}=T_M
+$$
+
+Linearized dynamics used in the report:
+
+$$
+T_g = (a+I_w)\ddot{\theta} + I_w\ddot{\phi} = b\theta
+$$
+
+where
+
+$$
+a = m_bH_1^2 + m_wH_2^2,\qquad
+b = (m_bH_1 + m_wH_2)g
+$$
+
+and
+
+$$
+T_M = I_w(\ddot{\theta}+\ddot{\phi})
+$$
+
+---
+
+### D) State-space form
+
+$$
+\dot{x}=Ax+Bu,\qquad
+x=\begin{bmatrix}
+\theta\\[2pt]
+\dot{\theta}\\[2pt]
+\phi\\[2pt]
+\dot{\phi}
+\end{bmatrix},\quad
+u=T_M
+$$
+
+$$
+\begin{aligned}
+\begin{bmatrix}
+\dot{\theta}\\[2pt]
+\ddot{\theta}\\[2pt]
+\dot{\phi}\\[2pt]
+\ddot{\phi}
+\end{bmatrix}
+&=
+\underbrace{\begin{bmatrix}
+0 & 1 & 0 & 0\\[2pt]
+\frac{b}{a} & 0 & 0 & 0\\[2pt]
+0 & 0 & 0 & 1\\[2pt]
+-\frac{b}{a} & 0 & 0 & 0
+\end{bmatrix}}_{A}
+\begin{bmatrix}
+\theta\\[2pt]
+\dot{\theta}\\[2pt]
+\phi\\[2pt]
+\dot{\phi}
+\end{bmatrix}
++
+\underbrace{\begin{bmatrix}
+0\\[2pt]
+-\frac{1}{a}\\[2pt]
+0\\[2pt]
+\frac{a+I_w}{aI_w}
+\end{bmatrix}}_{B}\,T_M
+\end{aligned}
+$$
+
+---
+
+### E) Q / R selection
+
+$$
+Q=
+\begin{bmatrix}
+1 & 0 & 0 & 0\\[2pt]
+0 & 1 & 0 & 0\\[2pt]
+0 & 0 & 0.001 & 0\\[2pt]
+0 & 0 & 0 & 1
+\end{bmatrix},\qquad
+R=1
+$$
+
+---
+
+### F) Gains
+
+Final tuned gains in firmware (`main_LQR.ino`):
+
+$$
+K =
+\begin{bmatrix}
+108.4496 & 9.6210 & 5.00 & 1.80
+\end{bmatrix}
+$$
+
+For the full MATLAB derivation and intermediate results, see: [`main_LQR/readme.md`](main_LQR/readme.md)
+
+---
+
+## CAD / STL
+
+- SolidWorks source: [`CAD Files/`](CAD%20Files/)
+- Printable STLs: [`STL Files/`](STL%20Files/)
+
+---
+
+## References
+
+[1] Olfati-Saber, Reza. “Global Stabilization of a Flat Underactuated System: The Inertia Wheel Pendulum.” CDC 2001.  
+[2] Çakan, Abdullah, and Ümit Önen. “Multibody Modeling and Balance Control of a Reaction Wheel Inverted Pendulum Using LQR Controller.” 2021.  
+[3] Lacey, Tony. “Tutorial: The Kalman Filter.” MIT.  
+[4] Nguyen, Hau; Cu, Minh Phuoc. “LQR and Fuzzy Control for Reaction Wheel Inverted Pendulum Model.” 2019.  
+[5] Leroy, Etienne. “Guide to Gyro and Accelerometer With Arduino Including Kalman Filtering.” 2011.  
+[6] Polotski, Vladimir. “Kalman filter, how do I choose initial P0?” 2017.  
+[7] Vathsangam, Harsh. “Complementary filter - My IMU estimation experience.” 2010.  
+[8] Abbeel, Pieter. “Optimal Control for Linear Dynamical Systems and Quadratic Cost.” UC Berkeley.  
+[9] Sears-Collins, Addison. “Combine the Extended Kalman Filter With LQR.” 2020.  
+[10] Quesada, Ricardo. “bluepad32 Arduino platform notes.”  
+[11] “1-Axis Attitude Control Module with ATOM.” M5Stack Projects, 2020.
+
+---
+
+## License
+BSD-2-Clause — see [`LICENSE`](LICENSE).
