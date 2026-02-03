@@ -165,53 +165,55 @@ Balancing loop states used in control:
 
 #### Kalman filter (tilt fusion in firmware)
 
-The firmware implements **two independent 1D (scalar) Kalman filters**—one for the X tilt (`agx`) and one for Y (`agy`).  
+The firmware implements **two independent 1D (scalar) Kalman filters**—one for X tilt (`agx`) and one for Y (`agy`).  
 For balancing, the controller mainly uses **X-axis tilt**.
 
-- Accelerometer “measurement” (deg):
+**Accelerometer “measurement”** (deg):
+
 $$
-z_k = aax = \arctan\!\left(\frac{a_y}{a_z}\right)\cdot\left(-\frac{180}{\pi}\right)
+z_k = a_{x,k} = \tan^{-1}\!\left(\frac{a_y}{a_z}\right)\cdot\left(-\frac{180}{\pi}\right)
 $$
 
-- Gyro rate (deg/s) and discrete integration (with $\Delta t=\texttt{loop\_time}/1000$):
+**Gyro rate + discrete integration** (with $\Delta t=\texttt{loop\_time}/1000$):
+
 $$
 \omega_{g,k} = -\frac{(g_x-g_{x0})}{\texttt{GyroRatio}},\qquad
-\hat{\theta}^{-}_k=\hat{\theta}_{k-1}+\omega_{g,k}\Delta t
+\hat{\theta}^{-}_k = \hat{\theta}_{k-1}+\omega_{g,k}\,\Delta t
 $$
 
-- Scalar Kalman update (with online-estimated $R_k$):
+**Scalar Kalman update** (with online-estimated $R_k$):
+
 $$
-\begin{aligned}
-P_k^- &= P_{k-1}+Q \\[2pt]
-K_k &= \frac{P_k^-}{P_k^-+R_k} \\[2pt]
-\hat{\theta}_k &= \hat{\theta}_k^- + K_k\left(z_k-\hat{\theta}_k^-\right) \\[2pt]
-P_k &= (1-K_k)P_k^-
-\end{aligned}
+\begin{aligned} P_k^- &= P_{k-1}+Q \\[2pt] K_k &= \frac{P_k^-}{P_k^-+R_k} \\[2pt] \hat{\theta}_k &= \hat{\theta}_k^- + K_k\left(z_k-\hat{\theta}_k^-\right) \\[2pt] P_k &= (1-K_k)P_k^- \end{aligned}
 $$
 
 **How $R_k$ is obtained in this project:**  
-The code keeps a sliding window of the last 10 accelerometer angles (`a_x[]`) and computes their sample variance as the measurement noise:
+The code keeps a sliding window of the last 10 accelerometer angles (`a_x[]`) and uses their sample variance as the measurement noise:
 
 $$
-R_k = \frac{1}{9}\sum_{i=1}^{10}\left(a_{x,i}-\bar{a}_x\right)^2,\qquad
-\bar{a}_x=\frac{1}{10}\sum_{i=1}^{10}a_{x,i}
+\bar{a}_x = \frac{1}{10}\sum_{i=1}^{10} a_{x,i},\qquad
+R_k = \frac{1}{9}\sum_{i=1}^{10}\left(a_{x,i}-\bar{a}_x\right)^2
 $$
 
 **Tuned constants / initial values (from `main_LQR.ino`):**
-- $P_0=1$ (implemented as `Px=1`, `Py=1`)
-- $Q=0.0025$ (implemented as `Px = Px + 0.0025` each update)
 
-**Gyro rate used by LQR:**  
-The raw gyro rate is converted back to deg/s as `v_gyrox`, then low-pass filtered:
+$$
+P_0=1,\qquad Q=0.0025
+$$
+
+**Gyro rate used by the LQR state feedback:**  
+In code, the gyro-derived angle rate is converted/scaled to deg/s and then low-pass filtered:
 
 $$
 \dot{\theta}_{\mathrm{LPF}}[k]=\alpha\,\dot{\theta}[k]+(1-\alpha)\,\dot{\theta}_{\mathrm{LPF}}[k-1],\qquad \alpha=0.4
 $$
 
+Code reference (for clarity):
 
-In code:
-- `v_gyrox = -gyrox*1000/loop_time`
-- `gyroXfilter = 0.4 * v_gyrox + 0.6 * gyroXfilter`
+```txt
+v_gyrox     = -gyrox * 1000 / loop_time
+gyroXfilter = 0.4 * v_gyrox + 0.6 * gyroXfilter
+
 
 
 ### State feedback (as implemented)
