@@ -166,21 +166,28 @@ Balancing loop states used in control:
 #### Kalman filter (tilt fusion in firmware)
 
 The firmware implements **two independent 1D (scalar) Kalman filters**—one for the X tilt (`agx`) and one for Y (`agy`).  
-For balancing, the controller mainly uses **X-axis tilt**:
+For balancing, the controller mainly uses **X-axis tilt**.
 
-- Accelerometer “measurement” (deg):  
-  $$z_k = aax = \arctan\!\left(\frac{a_y}{a_z}\right)\cdot\left(-\frac{180}{\pi}\right)$$
+- Accelerometer “measurement” (deg):
+$$
+z_k = aax = \arctan\!\left(\frac{a_y}{a_z}\right)\cdot\left(-\frac{180}{\pi}\right)
+$$
 
-- Gyro rate (deg/s) and discrete integration (with $\Delta t=\texttt{loop\_time}/1000$):  
-  $$\omega_{g,k} = -\frac{(g_x-g_{x0})}{\texttt{GyroRatio}},\qquad \hat{\theta}^{-}_k=\hat{\theta}_{k-1}+\omega_{g,k}\Delta t$$
+- Gyro rate (deg/s) and discrete integration (with $\Delta t=\texttt{loop\_time}/1000$):
+$$
+\omega_{g,k} = -\frac{(g_x-g_{x0})}{\texttt{GyroRatio}},\qquad
+\hat{\theta}^{-}_k=\hat{\theta}_{k-1}+\omega_{g,k}\Delta t
+$$
 
-- Scalar Kalman update (exactly what the code does, with online-estimated $R_k$):  
-  $$\begin{aligned}
-  P_k^- &= P_{k-1}+Q \\[2pt]
-  K_k &= \frac{P_k^-}{P_k^-+R_k} \\[2pt]
-  \hat{\theta}_k &= \hat{\theta}_k^- + K_k\left(z_k-\hat{\theta}_k^-\right) \\[2pt]
-  P_k &= (1-K_k)P_k^-
-  \end{aligned}$$
+- Scalar Kalman update (with online-estimated $R_k$):
+$$
+\begin{aligned}
+P_k^- &= P_{k-1}+Q \\[2pt]
+K_k &= \frac{P_k^-}{P_k^-+R_k} \\[2pt]
+\hat{\theta}_k &= \hat{\theta}_k^- + K_k\left(z_k-\hat{\theta}_k^-\right) \\[2pt]
+P_k &= (1-K_k)P_k^-
+\end{aligned}
+$$
 
 **How $R_k$ is obtained in this project:**  
 The code keeps a sliding window of the last 10 accelerometer angles (`a_x[]`) and computes their sample variance as the measurement noise:
@@ -194,15 +201,13 @@ $$
 - $P_0=1$ (implemented as `Px=1`, `Py=1`)
 - $Q=0.0025$ (implemented as `Px = Px + 0.0025` each update)
 
-**Extra smoothing before the Kalman update:**  
-Before computing $R_k$, the accelerometer angle is additionally smoothed using a short weighted history buffer (`aaxs[]`, `aays[]`) to reduce noise and improve stability.
-
 **Gyro rate used by LQR:**  
 The raw gyro rate is converted back to deg/s as `v_gyrox`, then low-pass filtered:
 
 $$
-\dot{\theta}_{\text{LPF}}[k]=\alpha\,\dot{\theta}[k]+(1-\alpha)\,\dot{\theta}_{\text{LPF}}[k-1],\qquad \alpha=0.4
+\dot{\theta}_{\mathrm{LPF}}[k]=\alpha\,\dot{\theta}[k]+(1-\alpha)\,\dot{\theta}_{\mathrm{LPF}}[k-1],\qquad \alpha=0.4
 $$
+
 
 In code:
 - `v_gyrox = -gyrox*1000/loop_time`
