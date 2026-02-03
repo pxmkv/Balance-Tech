@@ -162,6 +162,53 @@ Balancing loop states used in control:
 > **Important:** the implementation mixes units (**degrees**, **deg/s**, and **encoder ticks**).  
 > The resulting “LQR gains” in firmware should be treated as **tuned state-feedback gains** for these units.
 
+
+#### Kalman filter (tilt fusion in firmware)
+
+The firmware implements **two independent 1D (scalar) Kalman filters**—one for the X tilt (`agx`) and one for Y (`agy`).  
+For balancing, the controller mainly uses **X-axis tilt**:
+
+- Accelerometer “measurement” (deg):  
+  $$z_k = aax = \arctan\!\left(\frac{a_y}{a_z}\right)\cdot\left(-\frac{180}{\pi}\right)$$
+
+- Gyro rate (deg/s) and discrete integration (with $\Delta t=\texttt{loop\_time}/1000$):  
+  $$\omega_{g,k} = -\frac{(g_x-g_{x0})}{\texttt{GyroRatio}},\qquad \hat{\theta}^{-}_k=\hat{\theta}_{k-1}+\omega_{g,k}\Delta t$$
+
+- Scalar Kalman update (exactly what the code does, with online-estimated $R_k$):  
+  $$\begin{aligned}
+  P_k^- &= P_{k-1}+Q \\[2pt]
+  K_k &= \frac{P_k^-}{P_k^-+R_k} \\[2pt]
+  \hat{\theta}_k &= \hat{\theta}_k^- + K_k\left(z_k-\hat{\theta}_k^-\right) \\[2pt]
+  P_k &= (1-K_k)P_k^-
+  \end{aligned}$$
+
+**How $R_k$ is obtained in this project:**  
+The code keeps a sliding window of the last 10 accelerometer angles (`a_x[]`) and computes their sample variance as the measurement noise:
+
+$$
+R_k = \frac{1}{9}\sum_{i=1}^{10}\left(a_{x,i}-\bar{a}_x\right)^2,\qquad
+\bar{a}_x=\frac{1}{10}\sum_{i=1}^{10}a_{x,i}
+$$
+
+**Tuned constants / initial values (from `main_LQR.ino`):**
+- $P_0=1$ (implemented as `Px=1`, `Py=1`)
+- $Q=0.0025$ (implemented as `Px = Px + 0.0025` each update)
+
+**Extra smoothing before the Kalman update:**  
+Before computing $R_k$, the accelerometer angle is additionally smoothed using a short weighted history buffer (`aaxs[]`, `aays[]`) to reduce noise and improve stability.
+
+**Gyro rate used by LQR:**  
+The raw gyro rate is converted back to deg/s as `v_gyrox`, then low-pass filtered:
+
+$$
+\dot{\theta}_{\text{LPF}}[k]=\alpha\,\dot{\theta}[k]+(1-\alpha)\,\dot{\theta}_{\text{LPF}}[k-1],\qquad \alpha=0.4
+$$
+
+In code:
+- `v_gyrox = -gyrox*1000/loop_time`
+- `gyroXfilter = 0.4 * v_gyrox + 0.6 * gyroXfilter`
+
+
 ### State feedback (as implemented)
 The controller in `main_LQR.ino` computes:
 
