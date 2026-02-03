@@ -174,7 +174,7 @@ $$
 z_k = a_{x,k} = \tan^{-1}\!\left(\frac{a_y}{a_z}\right)\cdot\left(-\frac{180}{\pi}\right)
 $$
 
-**Gyro rate + discrete integration** (with $\Delta t=\texttt{loop\_time}/1000$):
+**Gyro rate + discrete integration** (with $\Delta t=\texttt{loop time}/1000$):
 
 $$
 \omega_{g,k} = -\frac{(g_x-g_{x0})}{\texttt{GyroRatio}},\qquad
@@ -228,7 +228,7 @@ And applies `PWM` to the momentum wheel motor. If `|euler_angle| > 22°`, the mo
 
 ---
 
-## Engineering analysis (all equations converted to LaTeX)
+## Engineering analysis
 
 ### A) External torque requirement (gravity vs. reaction wheel)
 
